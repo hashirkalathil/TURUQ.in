@@ -3,10 +3,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { LoaderCircle, Save, X } from 'lucide-react';
+import ImageUploadBox from "../ui/ImageUploadBox";
 
 // --- MALAYALAM SLUGIFY LOGIC (Synced with AddAuthorForm) ---
 const MALAYALAM_MAP = {
-    'അ': 'a', 'ആ': 'aa', 'ഇ': 'i', 'ഈ': 'ee', 'ഉ': 'u', 'ഊ': 'oo', 
+    'അ': 'a', 'ആ': 'aa', 'ഇ': 'i', 'ഈ': 'ee', 'ഉ': 'u', 'ഊ': 'oo',
     'ഋ': 'ru', 'എ': 'e', 'ഏ': 'e', 'ഐ': 'ai', 'ഒ': 'o', 'ഓ': 'o', 'ഔ': 'au',
     'ക': 'ka', 'ഖ': 'kha', 'ഗ': 'ga', 'ഘ': 'gha', 'ങ': 'nga',
     'ച': 'cha', 'ഛ': 'chha', 'ജ': 'ja', 'ഝ': 'jha', 'ഞ': 'nja',
@@ -14,14 +15,14 @@ const MALAYALAM_MAP = {
     'ത': 'ta', 'ഥ': 'tha', 'ദ': 'da', 'ധ': 'dha', 'ന': 'na',
     'പ': 'pa', 'ഫ': 'pha', 'ബ': 'ba', 'ഭ': 'bha', 'മ': 'ma',
     'യ': 'ya', 'ര': 'ra', 'ല': 'la', 'വ': 'va',
-    'ശ': 'sha', 'ഷ': 'sha', 'സ': 'sa', 'ഹ': 'ha', 
+    'ശ': 'sha', 'ഷ': 'sha', 'സ': 'sa', 'ഹ': 'ha',
     'ള': 'la', 'ഴ': 'zha', 'റ': 'ra',
     'ൺ': 'n', 'ൻ': 'n', 'ർ': 'r', 'ൽ': 'l', 'ൾ': 'l', 'ൿ': 'k',
-    'ാ': 'aa', 'ി': 'i', 'ീ': 'ee', 'ു': 'u', 'ൂ': 'oo', 
-    'ൃ': 'ru', 'െ': 'e', 'േ': 'e', 'ൈ': 'ai', 
+    'ാ': 'aa', 'ി': 'i', 'ീ': 'ee', 'ു': 'u', 'ൂ': 'oo',
+    'ൃ': 'ru', 'െ': 'e', 'േ': 'e', 'ൈ': 'ai',
     'ൊ': 'o', 'ോ': 'o', 'ൗ': 'au', 'ൌ': 'au',
     'ം': 'm', 'ഃ': 'h', '്': '',
-    '൦': '0', '൧': '1', '൨': '2', '൩': '3', '൪': '4', 
+    '൦': '0', '൧': '1', '൨': '2', '൩': '3', '൪': '4',
     '൫': '5', '൬': '6', '൭': '7', '൮': '8', '൯': '9'
 };
 const CONSONANTS = new Set(['ക', 'ഖ', 'ഗ', 'ഘ', 'ങ', 'ച', 'ഛ', 'ജ', 'ഝ', 'ഞ', 'ട', 'ഠ', 'ഡ', 'ഢ', 'ണ', 'ത', 'ഥ', 'ദ', 'ധ', 'ന', 'പ', 'ഫ', 'ബ', 'ഭ', 'മ', 'യ', 'ര', 'ല', 'വ', 'ശ', 'ഷ', 'സ', 'ഹ', 'ള', 'ഴ', 'റ']);
@@ -32,7 +33,7 @@ const slugify = (text) => {
     if (!text) return '';
     const normalized = text.toString().toLowerCase();
     let result = '';
-    
+
     for (let i = 0; i < normalized.length; i++) {
         const char = normalized[i];
         const nextChar = normalized[i + 1];
@@ -76,17 +77,17 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
             setError('');
             try {
                 // Fetch the list of authors
-                const res = await fetch(`/api/admin/authors`, { 
+                const res = await fetch(`/api/admin/authors`, {
                     headers: { 'x-api-key': API_KEY_TO_SEND },
                 });
-                
+
                 if (!res.ok) throw new Error(`Status: ${res.status}`);
-                
+
                 const jsonData = await res.json();
-                
+
                 // FIX: API returns { data: [...] }, so we extract the array
                 const authorsList = jsonData.data || [];
-                
+
                 // Find the specific author from the list
                 const author = authorsList.find(a => a._id === authorId);
 
@@ -139,7 +140,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
                     'Content-Type': 'application/json',
                     'x-api-key': API_KEY_TO_SEND,
                 },
-                body: JSON.stringify({ _id: authorId, ...formData }), 
+                body: JSON.stringify({ _id: authorId, ...formData }),
             });
 
             const result = await res.json();
@@ -148,7 +149,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
                 throw new Error(result.message || 'Failed to update author');
             }
 
-            onAuthorUpdated(result); 
+            onAuthorUpdated(result);
 
         } catch (err) {
             console.error('Update Author Error:', err.message);
@@ -157,7 +158,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
             setSubmitting(false);
         }
     };
-    
+
     // UI rendering
     if (loading) {
         return (
@@ -170,7 +171,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
     if (error && !formData) {
         return <div className="p-8 text-sm text-red-700">Error: {error}</div>;
     }
-    
+
     return (
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
             {error && (
@@ -178,6 +179,17 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
                     {error}
                 </div>
             )}
+
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Author Avatar</label>
+                <ImageUploadBox
+                    onUpload={(url) => setFormData(prev => ({ ...prev, avatar: url }))}
+                    folder="turuq/authors"
+                    filename={formData?.slug}
+                    existingImage={formData?.avatar}
+                    label="Profile Photo"
+                />
+            </div>
 
             <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -223,7 +235,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 text-sm bg-gray-50"
                 />
             </div>
-            
+
             <div>
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
                 <input
@@ -235,7 +247,7 @@ export const EditAuthorForm = ({ authorId, onAuthorUpdated, onCancel }) => {
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 text-sm"
                 />
             </div>
-            
+
             <div>
                 <label htmlFor="biography" className="block text-sm font-medium text-gray-700">Biography</label>
                 <textarea

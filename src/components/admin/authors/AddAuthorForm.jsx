@@ -3,9 +3,10 @@
 
 import React, { useState } from "react";
 import { LoaderCircle, Save, X } from "lucide-react";
+import ImageUploadBox from "../ui/ImageUploadBox";
 
 const MALAYALAM_MAP = {
-  'അ': 'a', 'ആ': 'aa', 'ഇ': 'i', 'ഈ': 'ee', 'ഉ': 'u', 'ഊ': 'oo', 
+  'അ': 'a', 'ആ': 'aa', 'ഇ': 'i', 'ഈ': 'ee', 'ഉ': 'u', 'ഊ': 'oo',
   'ഋ': 'ru', 'എ': 'e', 'ഏ': 'e', 'ഐ': 'ai', 'ഒ': 'o', 'ഓ': 'o', 'ഔ': 'au',
   'ക': 'ka', 'ഖ': 'kha', 'ഗ': 'ga', 'ഘ': 'gha', 'ങ': 'nga',
   'ച': 'cha', 'ഛ': 'chha', 'ജ': 'ja', 'ഝ': 'jha', 'ഞ': 'nja',
@@ -13,14 +14,14 @@ const MALAYALAM_MAP = {
   'ത': 'ta', 'ഥ': 'tha', 'ദ': 'da', 'ധ': 'dha', 'ന': 'na',
   'പ': 'pa', 'ഫ': 'pha', 'ബ': 'ba', 'ഭ': 'bha', 'മ': 'ma',
   'യ': 'ya', 'ര': 'ra', 'ല': 'la', 'വ': 'va',
-  'ശ': 'sha', 'ഷ': 'sha', 'സ': 'sa', 'ഹ': 'ha', 
+  'ശ': 'sha', 'ഷ': 'sha', 'സ': 'sa', 'ഹ': 'ha',
   'ള': 'la', 'ഴ': 'zha', 'റ': 'ra',
   'ൺ': 'n', 'ൻ': 'n', 'ർ': 'r', 'ൽ': 'l', 'ൾ': 'l', 'ൿ': 'k',
-  'ാ': 'aa', 'ി': 'i', 'ീ': 'ee', 'ു': 'u', 'ൂ': 'oo', 
-  'ൃ': 'ru', 'െ': 'e', 'േ': 'e', 'ൈ': 'ai', 
+  'ാ': 'aa', 'ി': 'i', 'ീ': 'ee', 'ു': 'u', 'ൂ': 'oo',
+  'ൃ': 'ru', 'െ': 'e', 'േ': 'e', 'ൈ': 'ai',
   'ൊ': 'o', 'ോ': 'o', 'ൗ': 'au', 'ൌ': 'au',
   'ം': 'm', 'ഃ': 'h', '്': '',
-  '൦': '0', '൧': '1', '൨': '2', '൩': '3', '൪': '4', 
+  '൦': '0', '൧': '1', '൨': '2', '൩': '3', '൪': '4',
   '൫': '5', '൬': '6', '൭': '7', '൮': '8', '൯': '9'
 };
 
@@ -32,7 +33,7 @@ const slugify = (text) => {
   if (!text) return '';
   const normalized = text.toString().toLowerCase();
   let result = '';
-  
+
   for (let i = 0; i < normalized.length; i++) {
     const char = normalized[i];
     const nextChar = normalized[i + 1];
@@ -113,6 +114,10 @@ export const AddAuthorForm = ({ onAuthorAdded, onCancel }) => {
     }
   };
 
+  const handleImageUpload = (url) => {
+    setFormData(prev => ({ ...prev, avatar: url }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="p-4 space-y-4">
       {error && (
@@ -120,6 +125,16 @@ export const AddAuthorForm = ({ onAuthorAdded, onCancel }) => {
           {error}
         </div>
       )}
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Author Avatar</label>
+        <ImageUploadBox
+          onUpload={handleImageUpload}
+          folder="turuq/authors"
+          filename={formData.slug}
+          label="Profile Photo"
+        />
+      </div>
 
       <div>
         <label htmlFor="name" className="block text-sm font-medium text-gray-700">

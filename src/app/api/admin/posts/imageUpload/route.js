@@ -46,11 +46,22 @@ export async function POST(req) {
   try {
     const dataUrl = await bufferToDataUrl(file);
 
-    const uploadResult = await cloudinary.uploader.upload(dataUrl, {
-      folder: "turuq",
+    const folder = formData.get("folder") || "turuq";
+    const publicId = formData.get("public_id");
+
+    const uploadOptions = {
+      folder: folder,
       resource_type: "auto",
       format: "webp",
-    });
+    };
+
+    if (publicId) {
+      uploadOptions.public_id = publicId;
+      uploadOptions.overwrite = true;
+      uploadOptions.invalidate = true;
+    }
+
+    const uploadResult = await cloudinary.uploader.upload(dataUrl, uploadOptions);
 
     return NextResponse.json({ imageUrl: uploadResult.secure_url });
   } catch (error) {

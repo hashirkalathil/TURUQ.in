@@ -3,13 +3,13 @@
 
 import React, { useEffect, useState, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { 
-  ArrowLeft, 
-  Plus, 
-  Minus, 
-  Search, 
-  Loader2, 
-  FileText 
+import {
+  ArrowLeft,
+  Plus,
+  Minus,
+  Search,
+  Loader2,
+  FileText
 } from 'lucide-react';
 import { useNotification } from '@/components/ui/notification/NotificationProvider';
 
@@ -36,12 +36,12 @@ const updatePostWebzine = async (postId, webzineId) => {
   const res = await fetch('/api/admin/posts', {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      _id: postId, 
-      webzine_id: webzineId 
+    body: JSON.stringify({
+      _id: postId,
+      webzine_id: webzineId
     }),
   });
-  
+
   if (!res.ok) {
     const error = await res.json();
     throw new Error(error.message || "Failed to update post");
@@ -71,7 +71,7 @@ function ArrangeContent() {
   const loadPosts = useCallback(async () => {
     if (!webzineId) return;
     setLoading(true);
-    
+
     // Fetch posts (load once, filter locally)
     const allPosts = await fetchAllPosts();
 
@@ -82,12 +82,16 @@ function ArrangeContent() {
       // Check if post belongs to THIS webzine
       // Handles both populated object or direct ID string
       const pWebzineId = post.webzine_id?._id || post.webzine_id;
-      
+
+      // If the post belongs to THIS webzine, add to assigned
       if (pWebzineId === webzineId) {
         assigned.push(post);
-      } else {
+      }
+      // If the post has NO webzine assigned, add to available
+      else if (!pWebzineId) {
         available.push(post);
       }
+      // If post has a DIFFERENT webzine assigned, we ignore it (it's not available)
     });
 
     setAssignedPosts(assigned);
@@ -105,10 +109,10 @@ function ArrangeContent() {
     setProcessingId(post._id);
     try {
       await updatePostWebzine(post._id, webzineId);
-      
+
       setAvailablePosts(prev => prev.filter(p => p._id !== post._id));
-      setAssignedPosts(prev => [ { ...post, webzine_id: webzineId }, ...prev ]);
-      
+      setAssignedPosts(prev => [{ ...post, webzine_id: webzineId }, ...prev]);
+
       addNotification('success', 'Post added to webzine');
     } catch (error) {
       addNotification('error', 'Failed to add post');
@@ -121,10 +125,10 @@ function ArrangeContent() {
     setProcessingId(post._id);
     try {
       await updatePostWebzine(post._id, null);
-      
+
       setAssignedPosts(prev => prev.filter(p => p._id !== post._id));
-      setAvailablePosts(prev => [ { ...post, webzine_id: null }, ...prev ]);
-      
+      setAvailablePosts(prev => [{ ...post, webzine_id: null }, ...prev]);
+
       addNotification('success', 'Post removed from webzine');
     } catch (error) {
       addNotification('error', 'Failed to remove post');
@@ -135,7 +139,7 @@ function ArrangeContent() {
 
   // --- Filter Logic ---
   // We filter the available posts based on the search term here
-  const filteredAvailablePosts = availablePosts.filter(post => 
+  const filteredAvailablePosts = availablePosts.filter(post =>
     post.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -146,8 +150,8 @@ function ArrangeContent() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6 pt-4">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => router.back()} 
+          <button
+            onClick={() => router.back()}
             className="p-2 hover:bg-gray-200 rounded-full transition-colors"
           >
             <ArrowLeft className="w-5 h-5 text-gray-700" />
@@ -165,7 +169,7 @@ function ArrangeContent() {
 
       {/* Two Column Layout */}
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 min-h-0">
-        
+
         {/* Left Column: Available Posts */}
         <div className="flex flex-col bg-background border border-gray-300 rounded-xl shadow-sm overflow-hidden">
           <div className="p-4 border-b border-gray-300 bg-background">
@@ -174,7 +178,7 @@ function ArrangeContent() {
             </h2>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input 
+              <input
                 type="text"
                 placeholder="Search posts..."
                 className="w-full pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none"
@@ -193,8 +197,8 @@ function ArrangeContent() {
               </p>
             ) : (
               filteredAvailablePosts.map(post => (
-                <div 
-                  key={post._id} 
+                <div
+                  key={post._id}
                   className="group flex items-center justify-between p-3 bg-background border border-gray-300 rounded-lg hover:shadow-md transition-all"
                 >
                   <div className="min-w-0">
@@ -208,7 +212,7 @@ function ArrangeContent() {
                     disabled={processingId === post._id}
                     className="flex-shrink-0 p-2 bg-red-500 hover:bg-red-700 text-white rounded-full transition-colors"
                   >
-                     {processingId === post._id ? <Loader2 className="w-4 h-4 animate-spin"/> : <Plus className="w-4 h-4" />}
+                    {processingId === post._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                   </button>
                 </div>
               ))
@@ -229,7 +233,7 @@ function ArrangeContent() {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-2 bg-background">
             {loading ? (
-               <div className="flex justify-center py-10"><Loader2 className="animate-spin text-red-200" /></div>
+              <div className="flex justify-center py-10"><Loader2 className="animate-spin text-red-200" /></div>
             ) : assignedPosts.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-lg">
                 <p className="text-sm text-gray-400">No posts assigned yet.</p>
@@ -237,11 +241,11 @@ function ArrangeContent() {
               </div>
             ) : (
               assignedPosts.map(post => (
-                <div 
-                  key={post._id} 
+                <div
+                  key={post._id}
                   className="flex items-center justify-between p-3 bg-red-50/10 border border-gray-300 rounded-lg hover:border-red-200 transition-all"
                 >
-                   <div className="min-w-0">
+                  <div className="min-w-0">
                     <p className="font-semibold text-sm text-gray-800 truncate pr-4">{post.title}</p>
                     <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-800">
                       {post.status}
@@ -252,7 +256,7 @@ function ArrangeContent() {
                     disabled={processingId === post._id}
                     className="flex-shrink-0 p-2 bg-amber-500 hover:bg-amber-700 text-white border border-gray-300 rounded-full transition-colors"
                   >
-                    {processingId === post._id ? <Loader2 className="w-4 h-4 animate-spin"/> : <Minus className="w-4 h-4" />}
+                    {processingId === post._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Minus className="w-4 h-4" />}
                   </button>
                 </div>
               ))

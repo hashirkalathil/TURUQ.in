@@ -1,6 +1,7 @@
 // src/app/api/admin/webzines/route.js
 
 import Webzine from "@/models/Webzine"; // Ensure this matches your model path
+import Post from "@/models/Post"; // Added Post model import
 import { NextResponse } from "next/server";
 import dbConnect from "@/mongodb"; // Ensure this matches your dbConnect path
 
@@ -216,7 +217,13 @@ export async function DELETE(req) {
         { status: 404 }
       );
     }
-    
+
+    // Cleanup: Remove webzine_id from associated posts
+    await Post.updateMany(
+      { webzine_id: id },
+      { $set: { webzine_id: null } }
+    );
+
     return NextResponse.json({
       message: "Webzine deleted successfully.",
       deletedId: id,
