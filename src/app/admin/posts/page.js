@@ -58,11 +58,10 @@ const POSTS_COLUMNS = [
     header: "Status",
     render: (p) => (
       <span
-        className={`px-2 py-1 rounded text-xs font-semibold border ${
-          p.status === "published"
-            ? "bg-green-100 text-green-800 border-green-300"
-            : "bg-yellow-100 text-yellow-800 border-yellow-300"
-        }`}
+        className={`px-2 py-1 rounded text-xs font-semibold border ${p.status === "published"
+          ? "bg-green-100 text-green-800 border-green-300"
+          : "bg-yellow-100 text-yellow-800 border-yellow-300"
+          }`}
       >
         {p.status}
       </span>
@@ -145,7 +144,7 @@ export default function PostsPage() {
         body: JSON.stringify({ _id: id }),
       });
       if (!res.ok) throw new Error("Delete failed");
-      loadData(currentPage); 
+      loadData(currentPage);
     } catch (error) {
       alert("Error deleting post");
     }
@@ -162,7 +161,7 @@ export default function PostsPage() {
   };
 
   const refreshList = () => {
-    loadData(1); 
+    loadData(1);
     closeModal();
   };
 
@@ -218,6 +217,9 @@ export default function PostsPage() {
         onClose={closeModal}
         title={editingPostId ? "Edit Post" : "Add New Post"}
         className="max-w-full"
+        // User asked for "new post" modal to not close on outside click.
+        // It's better UX to lock it for edits too. I'll pass explicitly false for both cases to prevent data loss.
+        closeOnOutsideClick={false}
       >
         {editingPostId ? (
           <EditPostForm

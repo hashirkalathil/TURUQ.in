@@ -111,3 +111,57 @@ export async function getHomeData() {
     return { heroArticles: [], featuredArticles: [], mostRecentArticles: [] };
   }
 }
+
+export async function getAuthorDetails(identifier) {
+  try {
+    await dbConnect();
+    const Author = (await import("@/models/Author")).default;
+
+    // Try to find author by ID or Slug
+    let author = null;
+    if (!identifier) return null;
+
+    if (identifier.match(/^[0-9a-fA-F]{24}$/)) {
+      author = await Author.findById(identifier).lean();
+    }
+
+    if (!author) {
+      author = await Author.findOne({ slug: identifier }).lean();
+    }
+
+    if (!author) return null;
+
+    // Fetch posts by this author
+    const posts = await Post.find({ author_id: author._id, status: 'published' })
+      .sort({ created_at: -1 })
+      .populate('author_id') // Populate to ensure mapArticleData works (even though we know the author)
+      .populate('category_ids')
+      .populate({
+        path: 'subcategory_ids',
+        populate: {
+          path: 'parent_id',
+          model: 'Category',
+          select: 'slug'
+        }
+      })
+      .lean()
+      .exec();
+
+    const articles = posts.map(mapArticleData);
+
+    return {
+      author: {
+        name: author.name,
+        slug: author.slug,
+        biography: author.biography,
+        avatar: author.avatar || "https://placehold.co/150x150/ccc/333?text=User",
+        email: author.email
+      },
+      articles
+    };
+
+  } catch (error) {
+    console.error("Service Error in getAuthorDetails:", error);
+    return null;
+  }
+}

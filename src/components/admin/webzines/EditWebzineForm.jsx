@@ -25,19 +25,19 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
             setLoading(true);
             setError('');
             try {
-                const res = await fetch(`/api/admin/webzines`, { 
+                const res = await fetch(`/api/admin/webzines`, {
                     headers: { 'x-api-key': API_KEY_TO_SEND },
                 });
-                
+
                 if (!res.ok) throw new Error(`Status: ${res.status}`);
-                
+
                 const jsonData = await res.json();
                 const list = Array.isArray(jsonData) ? jsonData : (jsonData.data || []);
                 const item = list.find(a => a._id === webzineId);
 
                 if (item) {
-                    const formattedDate = item.published_at 
-                        ? new Date(item.published_at).toISOString().split('T')[0] 
+                    const formattedDate = item.published_at
+                        ? new Date(item.published_at).toISOString().split('T')[0]
                         : '';
 
                     setFormData({
@@ -129,7 +129,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
                     'Content-Type': 'application/json',
                     'x-api-key': API_KEY_TO_SEND,
                 },
-                body: JSON.stringify({ id: webzineId, ...formData }), 
+                body: JSON.stringify({ id: webzineId, ...formData }),
             });
 
             const result = await res.json();
@@ -138,7 +138,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
                 throw new Error(result.message || 'Failed to update webzine');
             }
 
-            onWebzineUpdated(result); 
+            onWebzineUpdated(result);
 
         } catch (err) {
             console.error('Update Webzine Error:', err.message);
@@ -147,7 +147,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
             setSubmitting(false);
         }
     };
-    
+
     if (loading) {
         return (
             <div className="p-8 flex justify-center items-center text-gray-500">
@@ -159,7 +159,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
     if (error && !formData) {
         return <div className="p-8 text-sm text-red-700">Error: {error}</div>;
     }
-    
+
     return (
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
             {error && (
@@ -229,15 +229,15 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
             {/* --- IMAGE UPLOAD SECTION --- */}
             <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image</label>
-                
+
                 <div className="flex items-start space-x-4">
                     <div className="w-24 h-32 bg-gray-100 border border-gray-300 rounded-md flex items-center justify-center overflow-hidden relative flex-shrink-0">
                         {formData.cover_image ? (
-                            <Image 
-                                loader={({ src }) => src}
-                                src={formData.cover_image} 
-                                alt="Preview" 
-                                fill 
+                            <Image
+                                unoptimized={true}
+                                src={formData.cover_image}
+                                alt="Preview"
+                                fill
                                 className="object-cover"
                             />
                         ) : (
@@ -255,15 +255,15 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
                             <label className="cursor-pointer inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                                 <Upload className="w-4 h-4 mr-2" />
                                 {uploadingImage ? 'Uploading...' : 'Upload Image'}
-                                <input 
-                                    type="file" 
-                                    className="hidden" 
+                                <input
+                                    type="file"
+                                    className="hidden"
                                     accept="image/*"
                                     onChange={handleImageUpload}
                                     disabled={uploadingImage}
                                 />
                             </label>
-                            
+
                             {formData.cover_image && (
                                 <button
                                     type="button"
@@ -288,7 +288,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
                     </div>
                 </div>
             </div>
-            
+
             <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
                 <textarea

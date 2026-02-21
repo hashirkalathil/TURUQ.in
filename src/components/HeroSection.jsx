@@ -192,7 +192,7 @@ export default function HeroSection({ articles }) {
         >
           <Link href={link} className="block h-full w-full">
             <Image
-              loader={({ src }) => src}
+              unoptimized={true}
               key={currentSlide.id || currentIndex}
               src={image}
               alt={title}

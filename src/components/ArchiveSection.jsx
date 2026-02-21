@@ -25,12 +25,12 @@ const ArchiveSection = () => {
                     <ArrowRight size={16} className="sm:w-4 sm:h-4" />
                 </Link>
             </div>
-            
+
             <div className="flex flex-1 items-end justify-center gap-3 sm:gap-4 lg:gap-5 w-full lg:w-auto mt-0 lg:mt-[-100px]" data-aos="fade-up" data-aos-delay="200">
-                
+
                 <div className="h-[140px] sm:h-[170px] lg:h-[200px] aspect-14/20 rounded-md sm:rounded-lg overflow-hidden transition-transform hover:-translate-y-2">
                     <Image
-                        loader={({ src }) => src}
+                        unoptimized={true}
                         src="https://res.cloudinary.com/dgoz15sps/image/upload/v1762400012/turuq/diwszga98wvvx6ovl0f7.webp"
                         alt="Archive Cover 1"
                         width={144}
@@ -38,10 +38,10 @@ const ArchiveSection = () => {
                         className="h-full w-full object-cover transition-transform cursor-pointer"
                     />
                 </div>
-                
+
                 <div className="h-[200px] sm:h-[280px] lg:h-[370px] aspect-26/37 rounded-md sm:rounded-lg overflow-hidden transition-transform hover:-translate-y-2">
                     <Image
-                        loader={({ src }) => src}
+                        unoptimized={true}
                         src="https://res.cloudinary.com/dgoz15sps/image/upload/v1762400012/turuq/diwszga98wvvx6ovl0f7.webp"
                         alt="Archive Cover 2"
                         width={224}
@@ -49,10 +49,10 @@ const ArchiveSection = () => {
                         className="h-full w-full object-cover transition-transform cursor-pointer"
                     />
                 </div>
-                
+
                 <div className="h-40sm:h-[200px] lg:h-60 spect-[17/24] rounded-md sm:rounded-lg overflow-hidden transition-transform hover:-translate-y-2">
                     <Image
-                        loader={({ src }) => src}
+                        unoptimized={true}
                         src="https://res.cloudinary.com/dgoz15sps/image/upload/v1762400012/turuq/diwszga98wvvx6ovl0f7.webp"
                         alt="Archive Cover 3"
                         width={160}

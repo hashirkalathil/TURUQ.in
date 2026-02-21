@@ -80,7 +80,7 @@ export default function ImageUploadBox({
                 {image ? (
                     <div className="relative w-full h-48 bg-gray-50 border-2 border-dashed border-green-300 rounded-lg overflow-hidden flex items-center justify-center">
                         <Image
-                            loader={({ src }) => src}
+                            unoptimized={true}
                             src={image}
                             alt="Uploaded preview"
                             fill

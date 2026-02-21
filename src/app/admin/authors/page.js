@@ -69,7 +69,7 @@ const columns = [
         <div className="w-10 h-10 rounded-full overflow-hidden border border-black/50">
           {row.avatar ? (
             <Image
-              loader={({ src }) => src}
+              unoptimized={true}
               src={row.avatar}
               alt={row.name}
               width={40}

@@ -2,9 +2,11 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, Plus } from "lucide-react";
 import Select from "@/components/ui/select/Select";
 import RichTextEditor from "../ui/text-editor/TextEditor";
+import Modal from "@/components/admin/ui/modal/Modal";
+import { AddAuthorForm } from "../authors/AddAuthorForm";
 
 import { slugify } from "@/utils/slugify";
 
@@ -39,6 +41,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
   });
 
   const [classificationMode, setClassificationMode] = useState("category");
+  const [isAuthorModalOpen, setIsAuthorModalOpen] = useState(false);
 
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageUploadLoading, setImageUploadLoading] = useState(false);
@@ -100,11 +103,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     [authors]
   );
 
-  useEffect(() => {
-    if (values.title && !values.slug) {
-      setValues((s) => ({ ...s, slug: slugify(values.title) }));
-    }
-  }, [values.title, values.slug]);
+  // Removed useEffect for auto-slug if empty because we now do it in handleChange for title
 
   const handleChange = (e) => {
     if (typeof e === "string") {
@@ -114,7 +113,17 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     }
     const { name, value, type, checked } = e.target;
     setError("");
-    setValues((s) => ({ ...s, [name]: type === "checkbox" ? checked : value }));
+
+    setValues((s) => {
+      const newValues = { ...s, [name]: type === "checkbox" ? checked : value };
+
+      // Auto-generate slug on every title change
+      if (name === "title") {
+        newValues.slug = slugify(value);
+      }
+
+      return newValues;
+    });
   };
 
   const handlePermissionChange = (e) => {
@@ -198,6 +207,40 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     setValues((s) => ({ ...s, [name]: newValue.map((item) => item.value) }));
   };
 
+  // Load draft from localStorage on mount
+  useEffect(() => {
+    const savedDraft = localStorage.getItem("admin_post_draft");
+    if (savedDraft) {
+      try {
+        const parsedDraft = JSON.parse(savedDraft);
+        // Exclude slug from being restored, just in case old drafts have it
+        const { slug, ...rest } = parsedDraft;
+        setValues((prev) => ({ ...prev, ...rest }));
+      } catch (e) {
+        console.error("Failed to parse draft", e);
+      }
+    }
+  }, []);
+
+  // Save draft to localStorage whenever values change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      // Only save if there is title or content
+      if (values.title || values.content) {
+        // Create a copy without the slug
+        const { slug, ...draftValues } = values;
+        localStorage.setItem("admin_post_draft", JSON.stringify(draftValues));
+      }
+    }, 1000); // Debounce save
+    return () => clearTimeout(timer);
+  }, [values]);
+
+  const handleAuthorAdded = (newAuthor) => {
+    setAuthors((prev) => [...prev, newAuthor]);
+    setValues((prev) => ({ ...prev, author_id: newAuthor._id }));
+    setIsAuthorModalOpen(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -273,6 +316,9 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
       const json = await res.json();
       if (!res.ok)
         throw new Error(json.error || json.message || "Server error");
+
+      // Clear draft on success
+      localStorage.removeItem("admin_post_draft");
 
       onPostAdded(json.data);
     } catch (err) {
@@ -385,13 +431,25 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Author *</label>
-          <Select
-            options={authorOptions}
-            value={currentAuthorValue}
-            onChange={(val) => handleSingleSelectChange("author_id", val)}
-            placeholder="Select an Author"
-            isSearchable={true}
-          />
+          <div className="flex gap-2">
+            <div className="flex-grow">
+              <Select
+                options={authorOptions}
+                value={currentAuthorValue}
+                onChange={(val) => handleSingleSelectChange("author_id", val)}
+                placeholder="Select an Author"
+                isSearchable={true}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsAuthorModalOpen(true)}
+              className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 flex-shrink-0"
+              title="Add New Author"
+            >
+              <Plus className="w-5 h-5 text-gray-600" />
+            </button>
+          </div>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Status</label>
@@ -456,6 +514,20 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
           )}
         </button>
       </div>
+
+      {/* Add Author Modal */}
+      <Modal
+        isOpen={isAuthorModalOpen}
+        onClose={() => setIsAuthorModalOpen(false)}
+        title="Add New Author"
+        className="max-w-2xl"
+        closeOnOutsideClick={false}
+      >
+        <AddAuthorForm
+          onAuthorAdded={handleAuthorAdded}
+          onCancel={() => setIsAuthorModalOpen(false)}
+        />
+      </Modal>
     </form>
   );
 }
