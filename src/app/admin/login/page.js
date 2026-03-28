@@ -47,7 +47,7 @@ export default function LoginForm() {
     };
     
     return (
-        <div className="min-h-screen flex items-center justify-center bg-[#ffedd9] relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden">
             {/* Animated background elements */}
             <motion.div
                 className="absolute top-20 left-20 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70"
@@ -108,7 +108,7 @@ export default function LoginForm() {
                         transition={{ delay: 0.4 }}
                     >
                         <motion.div
-                            className="bg-gradient-to-br from-orange-400 to-amber-500 p-4 rounded-2xl mb-4 shadow-lg"
+                            className="bg-linear-to-br from-orange-400 to-amber-500 p-4 rounded-2xl mb-4 shadow-lg"
                             whileHover={{ scale: 1.05, rotate: 5 }}
                             transition={{ type: "spring", stiffness: 300 }}
                         >

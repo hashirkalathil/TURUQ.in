@@ -166,7 +166,7 @@ export const AddUserForm = ({ onUserAdded, onCancel }) => {
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
-                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-red-500 focus:ring-red-500 text-sm bg-white"
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-red-500 focus:ring-red-500 text-sm bg-background"
                 >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>

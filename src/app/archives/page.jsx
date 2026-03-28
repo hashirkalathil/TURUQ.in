@@ -68,7 +68,7 @@ export default async function ArchivesPage() {
                                     className="article-card relative rounded-xl border border-black p-5 transition-all duration-500 ease-in-out hover:-translate-y-1 hover:shadow-lg bg-background flex flex-col"
                                 >
                                     {/* Cover Image */}
-                                    <div className="article-image mb-4 aspect-1/1 w-full overflow-hidden rounded-xl">
+                                    <div className="article-image mb-4 aspect-square w-full overflow-hidden rounded-xl">
                                         <Link href={`/archives/${webzine.slug}`}>
                                             <Image
                                                 unoptimized={true}

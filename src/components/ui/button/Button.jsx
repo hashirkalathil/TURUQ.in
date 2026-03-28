@@ -100,7 +100,7 @@ const Button = ({
       {ripples.map(ripple => (
         <span
           key={ripple.id}
-          className="absolute rounded-full bg-white opacity-30 animate-ping"
+          className="absolute rounded-full bg-background opacity-30 animate-ping"
           style={{
             left: ripple.x,
             top: ripple.y,

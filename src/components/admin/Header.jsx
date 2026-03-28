@@ -13,14 +13,11 @@ import {
 } from "lucide-react";
 import { useNotification } from "../ui/notification/NotificationProvider";
 
-// 1. RECEIVE PROPS: Add isSidebarOpen and setIsSidebarOpen
 export default function Header({ currentUser, isSidebarOpen, setIsSidebarOpen }) {
   const [logoutLoading, setLogoutLoading] = useState(false);
   const { addNotification } = useNotification();
-  // Removed local 'menuOpen' state
   const [ddOpen, setDdOpen] = useState(false);
 
-  // 2. UPDATE TOGGLE: Use the prop setter
   const toggleMenu = () => setIsSidebarOpen(!isSidebarOpen);
   const toggleDd = () => setDdOpen((p) => !p);
 
@@ -59,21 +56,20 @@ export default function Header({ currentUser, isSidebarOpen, setIsSidebarOpen })
         className="rounded-full border-2 border-black object-cover"
       />
     ) : (
-      <div className="w-8 h-8 rounded-full border-2 border-black bg-[#ffedd9] grid place-items-center">
+      <div className="w-8 h-8 rounded-full border-2 border-black bg-background grid place-items-center">
         <User className="w-5 h-5 text-black" />
       </div>
     );
 
   return (
-    <header className="fixed bg-[#ffedd9] top-0 left-0 w-full z-50 pb-[10px]">
-      <div className="relative w-4/5 h-[70px] mx-auto mt-[30px] px-10 rounded-[50px] border border-black bg-[var(--clr-background)] flex items-center justify-between">
+    <header className="fixed bg-background top-0 left-0 w-full z-50 pb-[10px]">
+      <div className="relative w-4/5 h-[70px] mx-auto mt-[30px] px-10 rounded-[50px] border border-black bg-background flex items-center justify-between">
         
         {/* hamburger */}
         <button
           onClick={toggleMenu}
           aria-label="Toggle menu"
-          // 3. USE PROP FOR STYLING: isSidebarOpen instead of menuOpen
-          className={`relative z-[1001] w-10 h-10 rounded-full border border-black grid place-items-center transition-transform duration-500 ${
+          className={`relative z-1000 w-10 h-10 rounded-full border border-black grid place-items-center transition-transform duration-500 ${
             isSidebarOpen ? "rotate-180" : ""
           }`}
           style={{ background: "var(--clr-button)" }}
@@ -111,7 +107,7 @@ export default function Header({ currentUser, isSidebarOpen, setIsSidebarOpen })
             onClick={toggleDd}
             className={`flex items-center gap-2 px-3 py-2 rounded-[25px] border transition-all hover:-translate-y-0.5 hover:shadow-md ${
               ddOpen
-                ? "bg-[#ffedd9] border-black shadow-lg"
+                ? "bg-background border-black shadow-lg"
                 : "bg-black/5 border-transparent"
             }`}
           >
@@ -125,7 +121,7 @@ export default function Header({ currentUser, isSidebarOpen, setIsSidebarOpen })
 
           {/* dropdown panel */}
           <div
-            className={`absolute right-0 top-full mt-2 w-[220px] bg-[#ffedd9] border-2 border-black rounded-[15px] shadow-xl overflow-hidden transition-all origin-top-right
+            className={`absolute right-0 top-full mt-2 w-[220px] bg-background border-2 border-black rounded-[15px] shadow-xl overflow-hidden transition-all origin-top-right
               ${
                 ddOpen
                   ? "opacity-100 scale-100"

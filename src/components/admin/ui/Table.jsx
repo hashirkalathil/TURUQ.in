@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Filter, ChevronUp, ChevronDown, Search, LoaderCircle, RotateCw } from 'lucide-react';
+import { Filter, ChevronUp, ChevronDown, Search, LoaderCircle, RotateCw, Copy, Check } from 'lucide-react';
 import Skeleton from './Skeleton';
 
 const Table = ({

@@ -39,7 +39,7 @@ export default function EditorToolbar({
   }, []);
 
   return (
-    <div ref={toolbarRef} className="p-3 shadow-md bg-white border-b border-slate-200 sticky top-0 z-10">
+    <div ref={toolbarRef} className="p-3 shadow-md bg-background border-b border-slate-200 sticky top-0 z-10">
       <div className="flex flex-wrap items-center gap-1 max-w-7xl mx-auto">
         {/* Formatting */}
         <ToolbarButton onClick={() => execCommand("bold")} icon={Bold} title="Bold" commandName="bold" activeCommands={activeCommands} />
@@ -130,7 +130,7 @@ export default function EditorToolbar({
 }
 
 const ColorPopup = ({ colors, onSelect, onClose }) => (
-  <div className="absolute top-12 left-0 p-2 bg-white rounded-lg shadow-xl z-50 flex gap-1 flex-wrap w-48 border border-slate-200 animate-in fade-in zoom-in-95 duration-100">
+  <div className="absolute top-12 left-0 p-2 bg-background rounded-lg shadow-xl z-50 flex gap-1 flex-wrap w-48 border border-slate-200 animate-in fade-in zoom-in-95 duration-100">
     {colors.map((color) => (
       <button
         key={color}

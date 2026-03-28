@@ -4,20 +4,26 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import {
+  ChevronRight,
+  Copy,
+  Check,
+  Zap,
+  Star,
+  Lock,
   PlusCircle,
+  ChevronLeft,
   Edit,
   Eye,
-  Trash2,
-  ChevronLeft,
-  ChevronRight,
+  Trash2
 } from "lucide-react";
 
 import Table from "@/components/admin/ui/Table";
 import Modal from "@/components/admin/ui/modal/Modal";
 import AddPostForm from "@/components/admin/posts/AddPostForm";
 import EditPostForm from "@/components/admin/posts/EditPostForm";
+import ToggleSwitch from "@/components/ui/ToggleSwitch";
+import { useNotification } from "@/components/ui/notification/NotificationProvider";
 
-// Helper to fetch posts with pagination
 const fetchPosts = async (page = 1) => {
   try {
     const res = await fetch(`/api/admin/posts?page=${page}&limit=20`, {
@@ -56,21 +62,20 @@ const POSTS_COLUMNS = [
   {
     key: "status",
     header: "Status",
-    render: (p) => (
-      <span
-        className={`px-2 py-1 rounded text-xs font-semibold border ${p.status === "published"
-          ? "bg-green-100 text-green-800 border-green-300"
-          : "bg-yellow-100 text-yellow-800 border-yellow-300"
-          }`}
-      >
-        {p.status}
-      </span>
+    render: (p, { handleToggleStatus }) => (
+      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <ToggleSwitch
+          checked={p.status === "published"}
+          onChange={() => handleToggleStatus(p)}
+          label={p.status === "published" ? "Live" : "Draft"}
+        />
+      </div>
     ),
   },
   {
     key: "actions",
     header: "Actions",
-    render: (post, { handleEdit, handleDelete }) => (
+    render: (post, { handleEdit, handleDelete, handleCopyLink }) => (
       <div className="flex gap-2">
         <button
           className="p-1 rounded-full hover:bg-yellow-100 transition-colors"
@@ -78,14 +83,26 @@ const POSTS_COLUMNS = [
             e.stopPropagation();
             handleEdit(post._id);
           }}
+          title="Edit Post"
         >
           <Edit className="w-4 h-4 text-yellow-600" />
+        </button>
+        <button
+          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCopyLink(post);
+          }}
+          title="Copy Link"
+        >
+          <Copy className="w-4 h-4 text-gray-600" />
         </button>
         <Link
           href={`/${post.slug}`}
           target="_blank"
           className="p-1 rounded-full hover:bg-blue-100 transition-colors"
           onClick={(e) => e.stopPropagation()}
+          title="View Live"
         >
           <Eye className="w-4 h-4 text-blue-600" />
         </Link>
@@ -95,6 +112,7 @@ const POSTS_COLUMNS = [
             handleDelete(post._id);
           }}
           className="p-1 rounded-full hover:bg-red-100 transition-colors"
+          title="Delete Post"
         >
           <Trash2 className="w-4 h-4 text-red-600" />
         </button>
@@ -112,6 +130,7 @@ export default function PostsPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPostId, setEditingPostId] = useState(null);
+  const { addNotification } = useNotification();
 
   const loadData = useCallback(async (pageToLoad) => {
     setLoading(true);
@@ -144,10 +163,49 @@ export default function PostsPage() {
         body: JSON.stringify({ _id: id }),
       });
       if (!res.ok) throw new Error("Delete failed");
+      addNotification("success", "Post deleted successfully");
       loadData(currentPage);
     } catch (error) {
-      alert("Error deleting post");
+      addNotification("error", "Error deleting post");
     }
+  };
+
+  const updatePostProperty = async (post, update) => {
+    try {
+      const res = await fetch("/api/admin/posts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ _id: post._id, ...update }),
+      });
+      if (!res.ok) throw new Error("Update failed");
+      addNotification("success", "Post updated");
+      loadData(currentPage);
+    } catch (error) {
+      addNotification("error", "Failed to update post");
+    }
+  };
+
+  const handleToggleStatus = (post) => {
+    const newStatus = post.status === "published" ? "draft" : "published";
+    updatePostProperty(post, { status: newStatus });
+  };
+
+  const handleToggleFeatured = (post) => {
+    updatePostProperty(post, { 
+      permissions: { ...post.permissions, is_featured: !post.permissions?.is_featured } 
+    });
+  };
+
+  const handleTogglePremium = (post) => {
+    updatePostProperty(post, { 
+      permissions: { ...post.permissions, is_premium: !post.permissions?.is_premium } 
+    });
+  };
+
+  const handleCopyLink = (post) => {
+    const url = `${window.location.origin}/${post.slug}`;
+    navigator.clipboard.writeText(url);
+    addNotification("success", "Link copied to clipboard");
   };
 
   const handleEdit = (id) => {
@@ -186,7 +244,15 @@ export default function PostsPage() {
         loading={loading}
         searchable
         searchKeys={["title"]}
-        handlers={{ handleEdit, handleDelete }}
+        handlers={{ 
+          handleEdit, 
+          handleDelete, 
+          handleToggleStatus, 
+          handleToggleFeatured, 
+          handleTogglePremium,
+          handleCopyLink
+        }}
+        onReload={() => loadData(currentPage)}
       />
 
       {/* Pagination Controls */}
@@ -217,8 +283,6 @@ export default function PostsPage() {
         onClose={closeModal}
         title={editingPostId ? "Edit Post" : "Add New Post"}
         className="max-w-full"
-        // User asked for "new post" modal to not close on outside click.
-        // It's better UX to lock it for edits too. I'll pass explicitly false for both cases to prevent data loss.
         closeOnOutsideClick={false}
       >
         {editingPostId ? (

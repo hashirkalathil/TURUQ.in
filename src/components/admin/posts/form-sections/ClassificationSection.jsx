@@ -21,7 +21,7 @@ export default function ClassificationSection({
   );
 
   return (
-    <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-4">
+    <div className="bg-background p-4 rounded-lg border border-gray-200 space-y-4">
       <label className="block text-sm font-bold text-gray-800">
         Classification
       </label>

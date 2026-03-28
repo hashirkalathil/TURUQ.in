@@ -89,7 +89,7 @@ export default function ImageUploadBox({
 
                         {/* Overlay Actions */}
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                            <label className="cursor-pointer p-2 bg-white/90 rounded-full hover:bg-white text-gray-700 transition-transform hover:scale-105">
+                            <label className="cursor-pointer p-2 bg-background/90 rounded-full hover:bg-background text-gray-700 transition-transform hover:scale-105">
                                 <Upload className="w-5 h-5" />
                                 <input
                                     type="file"

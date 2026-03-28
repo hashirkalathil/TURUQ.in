@@ -18,7 +18,7 @@ export default function FeaturedImageSection({
     : null;
 
   return (
-    <div className="border p-4 rounded-lg bg-gray-50 space-y-3">
+    <div className="border p-4 rounded-lg bg-background space-y-3">
       <label className="text-sm font-bold text-gray-700 mb-1 flex items-center">
         <Upload className="w-4 h-4 mr-2" /> Featured Image
       </label>
@@ -30,7 +30,7 @@ export default function FeaturedImageSection({
       )}
 
       {imagePreviewUrl && (
-        <div className="relative w-full max-w-sm h-40 overflow-hidden rounded-lg shadow-md border bg-white">
+        <div className="relative w-full max-w-sm h-40 overflow-hidden rounded-lg shadow-md border bg-background">
           <Image
             src={imagePreviewUrl}
             alt="Featured Preview"

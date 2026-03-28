@@ -71,7 +71,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   const ResultCard = ({ result }) => (
-    <div className="h-full bg-[#ffedd9] flex flex-col article-card rounded-xl border border-black p-5 transition-all duration-500 ease-in-out hover:-translate-y-1 hover:shadow-lg">
+    <div className="h-full bg-background flex flex-col article-card rounded-xl border border-black p-5 transition-all duration-500 ease-in-out hover:-translate-y-1 hover:shadow-lg">
       {/* Image Section */}
       <Link href={result.link} onClick={onClose} className="block mb-4">
         <div className="article-image h-[200px] w-full overflow-hidden rounded-xl">
@@ -101,7 +101,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
       </div>
 
       {/* Title Section */}
-      <Link href={result.link} onClick={onClose} className="flex-grow">
+      <Link href={result.link} onClick={onClose} className="grow">
         <h3 className="article-title local-font-rachana text-[25px] h-[70px] overflow-hidden font-bold leading-[22px] py-1 text-[#a82a2a] hover:text-red-700 transition-colors">
           {result.title}
         </h3>
@@ -117,7 +117,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
   );
 
   return (
-    <div className="search-overlay fixed inset-0 bg-[#ffedd9] z-40 pt-[150px] overflow-y-auto transition-opacity duration-300 ease-in-out">
+    <div className="search-overlay fixed inset-0 bg-background z-40 pt-[150px] overflow-y-auto transition-opacity duration-300 ease-in-out">
       <div className="max-w-6xl mx-auto p-6">
         <h2 className="font-oswald text-4xl text-black text-center mb-12 uppercase">
           SEARCH HERE
@@ -125,7 +125,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
 
         {/* Search Bar */}
         <form onSubmit={handleFormSubmit} className="mb-16">
-          <div className="flex items-center border border-black rounded-[50px] bg-[#ffedd9] p-2.5">
+          <div className="flex items-center border border-black rounded-[50px] bg-background p-2.5">
             <input
               type="text"
               value={query}
@@ -138,7 +138,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
             <button
               type="submit"
               disabled={loading}
-              className="ml-4 flex-shrink-0 rounded-full p-3 transition-transform duration-200 hover:scale-105 disabled:opacity-70 cursor-pointer"
+              className="ml-4 shrink-0 rounded-full p-3 transition-transform duration-200 hover:scale-105 disabled:opacity-70 cursor-pointer"
               aria-label="Submit search"
             >
               {loading ? (
@@ -179,7 +179,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
         {/* See More Button */}
         {results.length > 0 && (
           <div className="text-center mt-12">
-            <button className="bg-red-600 text-white font-bold py-3 px-12 rounded-full border border-red-600 transition-all duration-300 hover:bg-white hover:text-red-600 shadow-xl">
+            <button className="bg-red-600 text-white font-bold py-3 px-12 rounded-full border border-red-600 transition-all duration-300 hover:bg-background hover:text-red-600 shadow-xl">
               SEE MORE
             </button>
           </div>

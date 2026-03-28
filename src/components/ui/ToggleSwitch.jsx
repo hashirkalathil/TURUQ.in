@@ -2,7 +2,7 @@
 import React from 'react';
 
 const ToggleSwitch = ({ label, name, checked, onChange }) => (
-  <label className="inline-flex items-center cursor-pointer group p-2 rounded-lg hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-gray-200">
+  <label className="inline-flex items-center cursor-pointer group p-2 rounded-lg hover:bg-background hover:shadow-sm transition-all border border-transparent hover:border-gray-200">
     <input
       type="checkbox"
       name={name}

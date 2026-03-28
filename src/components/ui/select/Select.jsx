@@ -28,7 +28,7 @@ const Select = ({
     };
 
     const variantClasses = {
-        default: 'bg-white border-gray-300 hover:border-gray-400',
+        default: 'bg-background border-gray-300 hover:border-gray-400',
         filled: 'bg-gray-100 border-gray-200 hover:bg-gray-200',
         ghost: 'bg-transparent border-gray-200 hover:bg-gray-50'
     };
@@ -249,7 +249,7 @@ const Select = ({
 
             <div
                 className={`
-          absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg
+          absolute z-50 w-full mt-2 bg-background border border-gray-200 rounded-lg shadow-lg
           transition-all duration-200 ease-in-out origin-top
           ${isOpen ? 'opacity-100 scale-y-100' : 'opacity-0 scale-y-95 pointer-events-none'}
         `}

@@ -228,7 +228,7 @@ export default function WebzinesPage() {
                   <h3 className="text-lg font-bold text-gray-900 capitalize mb-1 group-hover:text-amber-500 transition-colors">
                     {webzine.name}
                   </h3>
-                  <p className="text-xs text-gray-500 line-clamp-2 mb-4 line-clamp-2">
+                  <p className="text-xs text-gray-500 mb-4 line-clamp-2">
                     {webzine.description || "No description provided."}
                   </p>
 

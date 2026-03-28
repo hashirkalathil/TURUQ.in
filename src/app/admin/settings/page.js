@@ -131,7 +131,7 @@ export default function SettingsPage() {
                 name="site_name"
                 value={settings.site_name}
                 onChange={handleChange}
-                className="w-full border border-black rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                className="w-full border border-black rounded-xl p-3 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
                 placeholder="Enter site name"
               />
             </div>
@@ -143,7 +143,7 @@ export default function SettingsPage() {
                 value={settings.site_description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full border border-black rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                className="w-full border border-black rounded-xl p-3 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
                 placeholder="Enter site description for SEO"
               />
             </div>
@@ -158,7 +158,7 @@ export default function SettingsPage() {
                     name="contact_email"
                     value={settings.contact_email}
                     onChange={handleChange}
-                    className="w-full border border-black rounded-xl p-3 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                    className="w-full border border-black rounded-xl p-3 pl-10 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
                     placeholder="contact@turuq.com"
                   />
                 </div>
@@ -172,7 +172,7 @@ export default function SettingsPage() {
                     name="site_logo"
                     value={settings.site_logo}
                     onChange={handleChange}
-                    className="w-full border border-black rounded-xl p-3 pl-10 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                    className="w-full border border-black rounded-xl p-3 pl-10 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
                     placeholder="https://example.com/logo.png"
                   />
                 </div>
@@ -199,7 +199,7 @@ export default function SettingsPage() {
                   name={`social_${platform}`}
                   value={settings.social_links[platform]}
                   onChange={handleChange}
-                  className="w-full border border-black rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+                  className="w-full border border-black rounded-xl p-3 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
                   placeholder={`https://${platform}.com/turuq`}
                 />
               </div>
@@ -215,7 +215,7 @@ export default function SettingsPage() {
             name="footer_text"
             value={settings.footer_text}
             onChange={handleChange}
-            className="w-full border border-black rounded-xl p-3 bg-white focus:outline-none focus:ring-2 focus:ring-red-500/20"
+            className="w-full border border-black rounded-xl p-3 bg-background focus:outline-none focus:ring-2 focus:ring-red-500/20"
             placeholder="© 2024 TURUQ. All rights reserved."
           />
         </section>

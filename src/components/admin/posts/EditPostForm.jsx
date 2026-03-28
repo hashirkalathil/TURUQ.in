@@ -490,7 +490,6 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
           value={values.content}
           onChange={handleChange}
           onImageUpload={uploadInlineImage}
-          plainTextOnly={true}
         />
       </div>
 
@@ -511,7 +510,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
         <div>
           <label className="block text-sm font-medium mb-1">Author *</label>
           <div className="flex gap-2">
-            <div className="flex-grow">
+            <div className="grow">
               <Select
                 options={authorOptions}
                 value={currentAuthorValue}
@@ -524,7 +523,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
             <button
               type="button"
               onClick={() => setIsAuthorModalOpen(true)}
-              className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 flex-shrink-0"
+              className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 shrink-0"
               title="Add New Author"
             >
               <Plus className="w-5 h-5 text-gray-600" />
@@ -568,7 +567,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
       </div>
 
       {/* 9. Action Buttons */}
-      <div className="fixed bg-white right-12 left-5 bottom-14 flex justify-end gap-3 pt-4 border-t">
+      <div className="fixed bg-background right-12 left-5 bottom-14 flex justify-end gap-3 pt-4 border-t">
         <button
           type="button"
           onClick={onCancel}

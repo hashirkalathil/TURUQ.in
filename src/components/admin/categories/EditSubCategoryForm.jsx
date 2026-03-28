@@ -98,7 +98,7 @@ export default function EditSubCategoryForm({ subCategory, categories, onSubCate
                     value={parentCategory}
                     onChange={(e) => setParentCategory(e.target.value)}
                     required
-                    className="w-full border border-red-300 rounded-lg px-4 py-2 text-sm focus:ring-red-500 focus:border-red-500 transition bg-white"
+                    className="w-full border border-red-300 rounded-lg px-4 py-2 text-sm focus:ring-red-500 focus:border-red-500 transition bg-background"
                 >
                     <option value="">Select Parent Category</option>
                     {categories.map((cat) => (

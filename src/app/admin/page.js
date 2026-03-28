@@ -23,13 +23,13 @@ const DashboardPage = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await fetch('/api/admin/stats');
+                const res = await fetch('/api/admin/metrics');
                 if (res.ok) {
                     const json = await res.json();
                     setStats(json.data);
                 }
             } catch (error) {
-                console.error("Failed to fetch stats:", error);
+                console.error("Failed to fetch statistics:", error);
             } finally {
                 setLoading(false);
             }
@@ -37,15 +37,15 @@ const DashboardPage = () => {
 
         fetchStats();
 
-        // Update time every minute
         const timer = setInterval(() => setCurrentTime(new Date()), 60000);
         return () => clearInterval(timer);
     }, []);
 
     const statCards = [
         { label: 'Total Posts', value: stats?.totalPosts, icon: FileText, href: '/admin/posts' },
-        { label: 'Total Authors', value: stats?.totalAuthors, icon: Users, href: '/admin/authors' },
-        { label: 'Total categories', value: stats?.totalCategories, icon: FolderOpen, href: '/admin/categories' },
+        { label: 'Total Views', value: stats?.totalViews?.toLocaleString(), icon: Users, href: '/admin/posts' },
+        { label: 'Published', value: stats?.publishedPosts, icon: FolderOpen, href: '/admin/posts' },
+        { label: 'Drafts', value: stats?.draftPosts, icon: List, href: '/admin/posts' },
     ];
 
     const shortcuts = [
@@ -69,7 +69,7 @@ const DashboardPage = () => {
             </section>
 
             {/* Statistics Section */}
-            <section className="stats-section grid grid-cols-1 md:grid-cols-3 gap-6">
+            <section className="stats-section grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {loading ? (
                     [...Array(3)].map((_, i) => (
                         <div key={i} className="bg-background border border-black rounded-2xl p-6 h-32 flex flex-col justify-between">
@@ -156,7 +156,7 @@ const DashboardPage = () => {
                                 href={item.href}
                                 className="bg-background border border-black rounded-2xl flex items-center p-5 gap-3 hover:bg-[#f2cfa6] hover:shadow-lg transition-all hover:-translate-y-1 group"
                             >
-                                <div className="p-2 bg-white rounded-lg border border-black/5 group-hover:bg-black group-hover:text-white transition-colors">
+                                <div className="p-2 bg-background rounded-lg border border-black/5 group-hover:bg-black group-hover:text-white transition-colors">
                                     <item.icon className="w-5 h-5" />
                                 </div>
                                 <p className="font-poppins text-[16px] font-bold text-black">
@@ -171,4 +171,4 @@ const DashboardPage = () => {
     );
 };
 
-export default DashboardPage;
+export default DashboardPage;

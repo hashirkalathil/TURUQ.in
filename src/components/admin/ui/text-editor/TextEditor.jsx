@@ -6,7 +6,7 @@ import LinkModal from "./modals/LinkModal";
 import ImageModal from "./modals/ImageModal";
 import TableModal from "./modals/TableModal";
 
-const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false }) => {
+const RichTextEditor = ({ value, onChange, onImageUpload }) => {
   const [modals, setModals] = useState({ link: false, image: false, table: false, find: false });
   const [wordCount, setWordCount] = useState(0);
   const [findText, setFindText] = useState("");
@@ -18,7 +18,7 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
 
   useEffect(() => {
     if (editorRef.current) {
-      const normalizedValue = plainTextOnly ? stripHtml(value || "") : (value || "");
+      const normalizedValue = value || "";
       if (normalizedValue !== editorRef.current.innerHTML) {
         if (document.activeElement !== editorRef.current) {
           editorRef.current.innerHTML = normalizedValue;
@@ -26,7 +26,7 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
         }
       }
     }
-  }, [value, plainTextOnly]);
+  }, [value]);
 
   const stripHtml = (html) => {
     if (typeof document === 'undefined') return html;
@@ -44,16 +44,11 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
 
   const handleInput = () => {
     if (!editorRef.current) return;
-    let content;
-    if (plainTextOnly) {
-      content = editorRef.current.innerText || "";
-    } else {
-      content = cleanHtmlContent(editorRef.current.innerHTML);
-    }
+    const content = cleanHtmlContent(editorRef.current.innerHTML);
     
     if (onChange) onChange(content);
     updateWordCount();
-    if (!plainTextOnly) checkActiveCommands();
+    checkActiveCommands();
   };
 
   const handlePaste = (e) => {
@@ -151,7 +146,7 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
     for (let i = 0; i < rows; i++) {
       html += '<tr>';
       for (let j = 0; j < cols; j++) {
-        html += '<td class="border border-slate-300 p-2 min-w-[50px]">&nbsp;</td>';
+        html += '<td class="border border-gray-500 p-2 min-w-[50px]">&nbsp;</td>';
       }
       html += '</tr>';
     }
@@ -182,30 +177,19 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
 
   return (
     <div className="w-full flex flex-col bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
-      {!plainTextOnly && (
-        <EditorToolbar
-          execCommand={execCommand}
-          activeCommands={activeCommands}
-          wordCount={wordCount}
-          onShowLink={() => openModal('link')}
-          onShowImage={() => openModal('image')}
-          onShowTable={() => openModal('table')}
-          onToggleFindReplace={() => setModals(m => ({ ...m, find: !m.find }))}
-        />
-      )}
-
-      {plainTextOnly && (
-        <div className="p-3 bg-white border-b border-slate-200 flex justify-between items-center">
-          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Plain Text Mode</span>
-          <div className="text-sm text-slate-600 font-medium px-3 py-1 bg-slate-50 rounded-lg border border-slate-200">
-            {wordCount} words
-          </div>
-        </div>
-      )}
+      <EditorToolbar
+        execCommand={execCommand}
+        activeCommands={activeCommands}
+        wordCount={wordCount}
+        onShowLink={() => openModal('link')}
+        onShowImage={() => openModal('image')}
+        onShowTable={() => openModal('table')}
+        onToggleFindReplace={() => setModals(m => ({ ...m, find: !m.find }))}
+      />
 
       {/* Find Replace Bar */}
       {modals.find && (
-        <div className="flex gap-2 items-center p-3 bg-white border-b border-slate-200 animate-in slide-in-from-top-2">
+        <div className="flex gap-2 items-center p-3 bg-background border-b border-slate-200 animate-in slide-in-from-top-2">
           <input className="border border-slate-300 p-1.5 rounded text-sm" placeholder="Find..." value={findText} onChange={e => setFindText(e.target.value)} />
           <input className="border border-slate-300 p-1.5 rounded text-sm" placeholder="Replace..." value={replaceText} onChange={e => setReplaceText(e.target.value)} />
           <button type="button" onClick={handleFindReplace} className="bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700">Replace All</button>
@@ -214,11 +198,11 @@ const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false 
       )}
 
       {/* Editor Canvas */}
-      <div className={`flex-1 overflow-auto p-4 ${plainTextOnly ? 'bg-white' : 'bg-slate-50'}`}>
+      <div className="flex-1 overflow-auto p-4 bg-slate-50">
         <div 
           ref={editorRef}
           contentEditable
-          className={`${plainTextOnly ? 'min-h-[300px] border-none shadow-none p-4' : 'bg-white border border-slate-300 rounded-lg p-12 min-h-[400px] shadow-sm'} text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-100 editor-styles max-w-none w-full`}
+          className="bg-background border border-slate-300 rounded-lg p-12 min-h-[400px] shadow-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-100 editor-styles max-w-none w-full"
           onInput={handleInput}
           onBlur={handleInput}
           onPaste={handlePaste}
