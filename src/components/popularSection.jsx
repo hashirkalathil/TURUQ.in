@@ -90,7 +90,7 @@ export default function PopularArticles({ articles }) {
                                 </h3>
                             </a>
 
-                            <p className="local-font-rachana text-black/80 h-10 mb-2 text-sm sm:text-base hidden md:block leading-relaxed line-clamp-1 md:line-clamp-3">
+                            <p className="local-font-rachana text-black/80 mb-2 text-sm sm:text-base hidden md:block leading-5 line-clamp-1 md:line-clamp-3">
                                 {article.description}
                             </p>
 

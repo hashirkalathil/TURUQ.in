@@ -161,6 +161,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "turuq/posts");
       const res = await fetch("/api/admin/posts/imageUpload", {
         method: "POST",
         headers: API_HEADERS,
@@ -185,6 +186,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "turuq/posts");
       const res = await fetch("/api/admin/posts/inlineImageUpload", {
         method: "POST",
         headers: API_HEADERS,
@@ -309,7 +311,10 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     try {
       const res = await fetch("/api/admin/posts", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          ...API_HEADERS,
+          "Content-Type": "application/json" 
+        },
         body: JSON.stringify(payload),
       });
 
@@ -409,6 +414,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
           value={values.content}
           onChange={handleChange}
           onImageUpload={uploadInlineImage}
+          plainTextOnly={true}
         />
       </div>
 

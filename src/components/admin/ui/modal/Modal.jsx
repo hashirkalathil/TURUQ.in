@@ -44,7 +44,7 @@ export default function Modal({ isOpen, onClose, title, children, className, clo
       aria-labelledby={title ? "modal-title" : undefined}
     >
       <div
-        className={`bg-white rounded-2xl p-6 shadow-xl max-w-2xl w-full relative border border-red-200 overflow-y-auto max-h-[90vh] ${className}`}
+        className={`bg-background rounded-2xl p-6 shadow-xl max-w-2xl w-full relative border border-red-200 overflow-y-auto max-h-[90vh] ${className}`}
         onClick={(e) => e.stopPropagation()}
       >
         <button

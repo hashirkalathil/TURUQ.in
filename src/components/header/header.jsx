@@ -62,7 +62,7 @@ export default function Header() {
             {/* Nav Links - Hidden on mobile/tablet */}
             <div className="hidden lg:flex gap-6">
               <Link
-                href="/"
+                href="/webzine"
                 className="font-sans text-base lg:text-lg font-medium text-black transition-colors hover:text-red-600 no-underline whitespace-nowrap"
                 onClick={closeOverlays}
               >

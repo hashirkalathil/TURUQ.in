@@ -18,7 +18,6 @@ import { EditAuthorForm } from '@/components/admin/authors/EditAuthorForm';
 
 // --- API FETCH FUNCTION ---
 const fetchAuthors = async (addNotification) => {
-  // Use the public key for the client-side request
   const API_KEY_TO_SEND = process.env.NEXT_PUBLIC_API_KEY;
 
   if (!API_KEY_TO_SEND) {
@@ -43,9 +42,7 @@ const fetchAuthors = async (addNotification) => {
     }
 
     const jsonData = await res.json();
-
-    // FIX: The route now returns { data: [...] }, so we extract .data
-    // If jsonData.data is undefined, fallback to an empty array
+    
     return Array.isArray(jsonData.data) ? jsonData.data : [];
 
   } catch (error) {
@@ -53,7 +50,6 @@ const fetchAuthors = async (addNotification) => {
     if (addNotification) {
       addNotification('error', error.message || 'Error loading authors.');
     }
-    // Return empty array on error to prevent map errors in UI
     return [];
   }
 }
@@ -66,14 +62,13 @@ const columns = [
     sortable: true,
     render: (row) => (
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full overflow-hidden border border-black/50">
+        <div className="w-10 h-10 relative rounded-full overflow-hidden border border-black/50">
           {row.avatar ? (
             <Image
               unoptimized={true}
               src={row.avatar}
               alt={row.name}
-              width={40}
-              height={40}
+              fill
               className="object-cover"
             />
           ) : (
@@ -82,7 +77,7 @@ const columns = [
             </div>
           )}
         </div>
-        <span className="font-bold">{row.name}</span>
+        <p className="flex-1 font-bold">{row.name}</p>
       </div>
     ),
   },

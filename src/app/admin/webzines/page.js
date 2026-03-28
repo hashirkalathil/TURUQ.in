@@ -58,12 +58,11 @@ const fetchWebzines = async (addNotification) => {
 }
 
 export default function WebzinesPage() {
-  const router = useRouter(); // Hook for navigation
+  const router = useRouter();
   const { addNotification } = useNotification();
   const [webzines, setWebzines] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -77,7 +76,6 @@ export default function WebzinesPage() {
       const data = await fetchWebzines(addNotification);
       setWebzines(data);
     } catch (error) {
-      // Error handled in fetchWebzines
     } finally {
       setLoading(false);
     }
@@ -89,10 +87,7 @@ export default function WebzinesPage() {
 
   /* ------------- Handlers ------------- */
 
-  // 1. Navigation Handler
   const handleCardClick = (webzine) => {
-    // We pass the ID and Name as query parameters so the next page knows what to load
-    // The target URL will look like: /admin/webzine/arrange?id=xyz&title=november
     const params = new URLSearchParams({
       id: webzine._id,
       title: webzine.name
@@ -115,13 +110,13 @@ export default function WebzinesPage() {
   };
 
   const handleEdit = (e, id) => {
-    e.stopPropagation(); // Prevent clicking the card
+    e.stopPropagation();
     setItemToEditId(id);
     setIsEditModalOpen(true);
   };
 
   const openDeleteModal = (e, id, name) => {
-    e.stopPropagation(); // Prevent clicking the card
+    e.stopPropagation();
     setItemToDelete({ id, name });
     setIsDeleteModalOpen(true);
   };

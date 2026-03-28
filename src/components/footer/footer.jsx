@@ -6,47 +6,48 @@ import { BsTwitterX, BsInstagram, BsFacebook } from "react-icons/bs";
 
 export default function Footer() {
   return (
-    <footer className="bg-background mt-[60px]">
-      <div className="border-t border-b border-[#989696]">
-        <div className="mx-auto flex flex-col md:flex-row items-center justify-between w-[83%] max-w-[1250px] py-6 md:py-4 gap-6 md:gap-0">
+    <footer className="bg-background mt-[80px] lg:mt-[120px]">
+      <div className="border-t border-b border-gray-200 dark:border-gray-800">
+        <div className="mx-auto flex flex-col md:flex-row items-center justify-between w-full max-w-[1250px] px-6 lg:px-[8.5%] py-10 md:py-8 gap-8 md:gap-0">
           <div className="footer-logo">
-            <h2 className="font-oswald text-[35px] md:text-[45px] font-medium text-main-text m-0">TURUQ</h2>
+            <h2 className="font-oswald text-[32px] md:text-[45px] font-medium text-main-text m-0 tracking-tight">TURUQ</h2>
           </div>
-          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-[75px]">
-            <a href="#" className="flex items-center justify-center sm:justify-start gap-2 font-poppins text-[15px] font-normal text-[#575757] capitalize transition-colors hover:text-[#d64545]">
-              <BsFacebook size={20} />
-              <span>Facebook</span>
+          
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 md:gap-[60px] lg:gap-[75px]">
+            <a href="#" className="flex items-center gap-2 font-poppins text-[14px] md:text-[15px] font-medium text-gray-600 hover:text-[#d64545] transition-all duration-300 group">
+              <BsFacebook className="w-5 h-5 transition-transform group-hover:scale-110" />
+              <span className="capitalize">Facebook</span>
             </a>
-            <a href="#" className="flex items-center justify-center sm:justify-start gap-2 font-poppins text-[15px] font-normal text-[#575757] capitalize transition-colors hover:text-[#d64545]">
-              <BsInstagram size={20} />
-              <span>Instagram</span>
+            <a href="#" className="flex items-center gap-2 font-poppins text-[14px] md:text-[15px] font-medium text-gray-600 hover:text-[#d64545] transition-all duration-300 group">
+              <BsInstagram className="w-5 h-5 transition-transform group-hover:scale-110" />
+              <span className="capitalize">Instagram</span>
             </a>
-            <a href="#" className="flex items-center justify-center sm:justify-start gap-2 font-poppins text-[15px] font-normal text-[#575757] capitalize transition-colors hover:text-[#d64545]">
-              <BsTwitterX size={20} />
-              <span>X.com</span>
+            <a href="#" className="flex items-center gap-2 font-poppins text-[14px] md:text-[15px] font-medium text-gray-600 hover:text-[#d64545] transition-all duration-300 group">
+              <BsTwitterX className="w-4 h-4 transition-transform group-hover:scale-110" />
+              <span className="capitalize">X.com</span>
             </a>
           </div>
         </div>
       </div>
-      <div className="text-center py-5 w-[83%] max-w-[1250px] mx-auto">
-        <div className="flex flex-col gap-2">
-          <span className="font-poppins text-[15px] font-normal text-[#717171]">
-            © 2025 TURUQ
+
+      <div className="mx-auto w-full max-w-[1250px] px-6 lg:px-[8.5%] py-8">
+        <div className="flex flex-col items-center justify-between gap-4 text-center md:text-left">
+          <span className="font-poppins text-[14px] font-normal text-gray-500">
+            © {new Date().getFullYear()} TURUQ. All rights reserved.
           </span>
 
-          <span className="font-poppins text-[13px] font-normal text-[#888888]">
-            Developed by{" "}
+          <span className="font-poppins text-[13px] font-normal text-gray-400">
+            Crafted with passion by{" "}
             <Link
               href="https://yourname.in"
-              className="inline-flex items-center gap-1 text-[#d64545] font-medium"
+              className="inline-flex items-center gap-1.5 text-[#d64545] font-semibold hover:underline underline-offset-4 transition-all"
             >
               yourname
-              <ExternalLink size={13} />
+              <ExternalLink size={12} className="opacity-70" />
             </Link>
           </span>
         </div>
       </div>
-
     </footer>
   );
 }

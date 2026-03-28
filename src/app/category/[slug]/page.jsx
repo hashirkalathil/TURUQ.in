@@ -57,19 +57,23 @@ export default async function DynamicCategoryPage({ params }) {
         {/* SUB-FILTER (SubCategories) */}
         {filterLinks.length > 1 && (
           <nav className={styles.subCategoryContainer}>
-            {filterLinks.map((l) => (
-              <Tag
-                key={l.slug}
-                link={
-                  l.label.startsWith("All")
-                    ? `/category/${slug}`
-                    : `/category/${slug}/${l.slug}`
-                }
-                className={l.slug === slug ? "bg-[#e7000b]! text-white!" : ""}
-              >
-                {l.label}
-              </Tag>
-            ))}
+            {filterLinks.map((l) => {
+              const isActive = (l.label === "All" && !resolvedParams.subCategoryName) || 
+                               (resolvedParams.subCategoryName === l.slug);
+              return (
+                <Tag
+                  key={l.slug}
+                  link={
+                    l.label === "All"
+                      ? `/category/${slug}`
+                      : `/category/${slug}/${l.slug}`
+                  }
+                  className={isActive ? "bg-[#e7000b]! text-white!" : "bg-background"}
+                >
+                  {l.label.toUpperCase()}
+                </Tag>
+              );
+            })}
           </nav>
         )}
 

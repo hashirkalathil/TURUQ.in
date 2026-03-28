@@ -1,8 +1,9 @@
 // components/admin/ui/table/Table.jsx
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Filter, ChevronUp, ChevronDown, Search, LoaderCircle, RotateCw } from 'lucide-react'; // Added RotateCw
+import { useState, useMemo, useEffect } from 'react';
+import { Filter, ChevronUp, ChevronDown, Search, LoaderCircle, RotateCw } from 'lucide-react';
+import Skeleton from './Skeleton';
 
 const Table = ({
   data = [],
@@ -24,10 +25,20 @@ const Table = ({
   handlers = {},
 }) => {
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [sortKey, setSortKey] = useState('');
   const [sortDir, setSortDir] = useState('asc');
   const [selected, setSelected] = useState(new Set());
   const [bulkActionValue, setBulkActionValue] = useState('');
+
+  // Debounce search input
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 300);
+
+    return () => clearTimeout(handler);
+  }, [search]);
 
   const columnHasRenderForSearch = (key) => {
     return columns.some(col => col.key === key && col.render);
@@ -36,8 +47,8 @@ const Table = ({
   const processedData = useMemo(() => {
     let filtered = data;
 
-    if (search && searchable) {
-      const searchLower = search.toLowerCase();
+    if (debouncedSearch && searchable) {
+      const searchLower = debouncedSearch.toLowerCase();
       const keysToSearch = searchKeys.length ? searchKeys :
         columns.map(col => col.key).filter(key => {
           const sample = data[0]?.[key];
@@ -74,7 +85,7 @@ const Table = ({
     }
 
     return filtered;
-  }, [data, search, sortKey, sortDir, searchable, sortable, columns, searchKeys]);
+  }, [data, debouncedSearch, sortKey, sortDir, searchable, sortable, columns, searchKeys]);
 
   // Handle sorting
   const handleSort = (key) => {
@@ -119,14 +130,14 @@ const Table = ({
   };
 
   return (
-    <div className={`border border-black rounded-xl bg-[#ffedd9] p-5 ${className}`}>
+    <div className={`border border-black rounded-xl bg-background p-5 shadow-sm ${className}`}>
       {/* Controls */}
       <div className="flex items-center justify-between mb-4 gap-3">
         {/* Bulk Actions */}
         {selectable && bulkActions.length > 0 && (
           <div className="flex items-center gap-3">
             <select
-              className="bg-transparent border border-black rounded px-3 py-1 text-[12px]"
+              className="bg-[#f2cfa6] border border-black rounded px-3 py-1.5 text-[12px] font-bold outline-none"
               value={bulkActionValue}
               onChange={(e) => setBulkActionValue(e.target.value)}
             >
@@ -140,41 +151,39 @@ const Table = ({
             <button
               onClick={executeBulkAction}
               disabled={!bulkActionValue || selected.size === 0}
-              className="px-3 py-1 bg-red-700 text-white border border-black rounded text-[10px] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-1.5 bg-black text-white rounded font-bold text-[12px] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-gray-800 transition-colors"
             >
-              ✓
+              Apply
             </button>
           </div>
         )}
 
         {(!selectable || bulkActions.length === 0) && <div />}
 
-        {/* Divider */}
-        {selectable && bulkActions.length > 0 && searchable && (
-          <div className="h-5 w-px bg-black/30" />
-        )}
-
         {/* Search and Reload */}
         <div className="flex items-center gap-3 flex-1 justify-end">
           {searchable && (
-            <div className="flex items-center gap-2 max-w-sm text-sm border border-gray-300 rounded-lg px-3 py-1 bg-white">
-              <Search className="w-4 h-4 text-gray-600" />
+            <div className="flex items-center gap-2 max-w-sm text-sm border border-black rounded-lg px-4 py-1.5 bg-background focus-within:border-red-700 cursor-pointer transition-all">
+              <Search className="w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder={searchPlaceholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-transparent border-none outline-none w-full placeholder:text-gray-400 text-sm"
+                className="bg-transparent border-none outline-none w-full placeholder:text-gray-400 text-sm font-medium"
               />
+              {search !== debouncedSearch && (
+                <LoaderCircle className="w-3 h-3 animate-spin text-orange-400" />
+              )}
             </div>
           )}
           {onReload && (
             <button
               onClick={onReload}
-              className="p-2 rounded-lg bg-red-100 hover:bg-red-200 transition-colors"
+              className="p-2 rounded-lg bg-[#f2cfa6] hover:bg-orange-300 border border-black transition-colors"
               aria-label="Reload data"
             >
-              <RotateCw className="w-4 h-4 text-red-600" />
+              <RotateCw className={`w-4 h-4 text-black ${loading ? 'animate-spin' : ''}`} />
             </button>
           )}
         </div>
@@ -182,20 +191,20 @@ const Table = ({
 
       {/* Table */}
       <div
-        className="overflow-auto rounded-lg border border-black"
+        className="overflow-auto rounded-lg border border-black bg-background"
         style={{ maxHeight }}
       >
-        <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-[#f2cfa6] z-10">
+        <table className="w-full text-sm border-collapse">
+          <thead className="sticky top-0 bg-[#f2cfa6] z-10 border-b border-black">
             <tr>
               {/* Selection column */}
               {selectable && (
-                <th className="px-3 py-2">
+                <th className="px-4 py-3 w-10">
                   <input
                     type="checkbox"
                     checked={selected.size === processedData.length && processedData.length > 0}
                     onChange={toggleSelectAll}
-                    className="w-3 h-3"
+                    className="w-4 h-4 accent-black cursor-pointer"
                   />
                 </th>
               )}
@@ -205,12 +214,12 @@ const Table = ({
                 <th
                   key={column.key}
                   onClick={() => column.sortable !== false ? handleSort(column.key) : null}
-                  className={`px-3 py-2 text-left font-semibold text-sm ${sortable && column.sortable !== false
-                      ? 'cursor-pointer select-none hover:bg-[#eab892]'
+                  className={`px-4 py-3 text-left font-bold text-xs uppercase tracking-wider ${sortable && column.sortable !== false
+                      ? 'cursor-pointer select-none hover:bg-orange-200 transition-colors'
                       : ''
                     } ${column.headerClassName || ''}`}
                 >
-                  <div className="flex items-center gap-2 text-xs" >
+                  <div className="flex items-center gap-2" >
                     {column.header}
                     {sortable && column.sortable !== false && (
                       <div className="flex flex-col">
@@ -221,7 +230,7 @@ const Table = ({
                             <ChevronDown className="w-4 h-4" />
                           )
                         ) : (
-                          <Filter className="w-4 h-4" />
+                          <Filter className="w-3 h-3 text-black/30 group-hover:text-black" />
                         )}
                       </div>
                     )}
@@ -233,35 +242,35 @@ const Table = ({
 
           <tbody>
             {loading ? (
-              <tr>
-                <td
-                  colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="text-center py-10 text-gray-500"
-                >
-                  <div className="flex justify-center items-center text-sm">
-                    <LoaderCircle className="w-5 h-5 animate-spin mr-2" /> Loading data...
-                  </div>
-                </td>
-              </tr>
+              [...Array(5)].map((_, i) => (
+                <tr key={i} className="border-b border-gray-100">
+                  {selectable && <td className="px-4 py-4"><Skeleton className="h-4 w-4" /></td>}
+                  {columns.map((col) => (
+                    <td key={col.key} className="px-4 py-4">
+                      <Skeleton className="h-4 w-full" />
+                    </td>
+                  ))}
+                </tr>
+              ))
             ) : processedData.length > 0 ? (
               processedData.map((row, index) => {
-                const rowId = row.id || row._id || `row-${index}`; // Ensure a unique key
+                const rowId = row.id || row._id || `row-${index}`;
+                const isSelected = selected.has(rowId);
                 return (
                   <tr
                     key={rowId}
                     onClick={() => onRowClick(row, index)}
-                    className={`border-b border-black/20 hover:bg-orange-100 transition-colors text-sm ${onRowClick !== (() => { }) ? 'cursor-pointer' : ''
-                      }`}
+                    className={`border-b border-gray-100 hover:bg-orange-50/50 transition-colors ${isSelected ? 'bg-orange-50' : ''} ${onRowClick !== (() => { }) ? 'cursor-pointer' : ''}`}
                   >
                     {/* Selection column */}
                     {selectable && (
-                      <td className="px-3 py-2">
+                      <td className="px-4 py-4">
                         <input
                           type="checkbox"
-                          checked={selected.has(rowId)}
+                          checked={isSelected}
                           onChange={() => toggleSelect(rowId)}
                           onClick={(e) => e.stopPropagation()}
-                          className="w-3 h-3"
+                          className="w-4 h-4 accent-black cursor-pointer"
                         />
                       </td>
                     )}
@@ -270,10 +279,10 @@ const Table = ({
                     {columns.map((column) => (
                       <td
                         key={column.key}
-                        className={`px-2 py-2 text-xs ${column.className || ''}`}
+                        className={`px-4 py-2 text-[12px] h-[10px] ${column.className || ''}`}
                       >
                         {column.render
-                          ? column.render(row, handlers) // Pass the entire row and handlers
+                          ? column.render(row, handlers)
                           : row[column.key]
                         }
                       </td>
@@ -285,9 +294,12 @@ const Table = ({
               <tr>
                 <td
                   colSpan={columns.length + (selectable ? 1 : 0)}
-                  className="text-center py-10 text-gray-500 text-sm"
+                  className="text-center py-20 text-gray-400 text-sm font-medium"
                 >
-                  {emptyMessage}
+                  <div className="flex flex-col items-center gap-2">
+                    <Search className="w-8 h-8 opacity-20" />
+                    {emptyMessage}
+                  </div>
                 </td>
               </tr>
             )}
@@ -297,12 +309,12 @@ const Table = ({
 
       {/* Footer info */}
       {processedData.length > 0 && (
-        <div className="mt-3 text-[10px] text-gray-600 flex justify-between">
+        <div className="mt-4 px-2 text-[11px] font-bold text-gray-500 uppercase tracking-widest flex justify-between">
           <span>
-            Showing {processedData.length} of {data.length} entries
+            Total: {processedData.length} {processedData.length === 1 ? 'entry' : 'entries'}
           </span>
           {selectable && selected.size > 0 && (
-            <span>
+            <span className="text-black bg-[#f2cfa6] px-2 rounded">
               {selected.size} selected
             </span>
           )}

@@ -7,7 +7,7 @@ import { Home, ArrowLeft, Search } from 'lucide-react'
 
 export default function NotFound() {
     return (
-        <div className="max-h-screen h-[80vh] bg-[#ffedd9] flex items-center justify-center p-4">
+        <div className="max-h-screen h-[80vh] bg-background flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center space-y-8">
                 {/* 404 Number */}
                 <div className="space-y-4">

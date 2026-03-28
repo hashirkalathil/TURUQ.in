@@ -2,11 +2,11 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import "./textEditor.css"; 
 import EditorToolbar from "./EditorToolbar";
-import LinkModal from "./modals/LinkModal"; // Checked path consistency
+import LinkModal from "./modals/LinkModal";
 import ImageModal from "./modals/ImageModal";
 import TableModal from "./modals/TableModal";
 
-const RichTextEditor = ({ value, onChange, onImageUpload }) => {
+const RichTextEditor = ({ value, onChange, onImageUpload, plainTextOnly = false }) => {
   const [modals, setModals] = useState({ link: false, image: false, table: false, find: false });
   const [wordCount, setWordCount] = useState(0);
   const [findText, setFindText] = useState("");
@@ -17,17 +17,23 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
   const savedSelectionRef = useRef(null); 
 
   useEffect(() => {
-    if (editorRef.current && value !== editorRef.current.innerHTML) {
-      if (document.activeElement !== editorRef.current) {
-         editorRef.current.innerHTML = value || "";
-         updateWordCount();
+    if (editorRef.current) {
+      const normalizedValue = plainTextOnly ? stripHtml(value || "") : (value || "");
+      if (normalizedValue !== editorRef.current.innerHTML) {
+        if (document.activeElement !== editorRef.current) {
+          editorRef.current.innerHTML = normalizedValue;
+          updateWordCount();
+        }
       }
     }
-    if (editorRef.current && !editorRef.current.innerHTML && value) {
-        editorRef.current.innerHTML = value;
-        updateWordCount();
-    }
-  }, [value]);
+  }, [value, plainTextOnly]);
+
+  const stripHtml = (html) => {
+    if (typeof document === 'undefined') return html;
+    const tmp = document.createElement("DIV");
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || "";
+  };
 
   const updateWordCount = () => {
     if (!editorRef.current) return;
@@ -38,10 +44,22 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
 
   const handleInput = () => {
     if (!editorRef.current) return;
-    const html = cleanHtmlContent(editorRef.current.innerHTML);
-    if (onChange) onChange(html);
+    let content;
+    if (plainTextOnly) {
+      content = editorRef.current.innerText || "";
+    } else {
+      content = cleanHtmlContent(editorRef.current.innerHTML);
+    }
+    
+    if (onChange) onChange(content);
     updateWordCount();
-    checkActiveCommands();
+    if (!plainTextOnly) checkActiveCommands();
+  };
+
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData("text/plain");
+    document.execCommand("insertText", false, text);
   };
 
   const saveSelection = () => {
@@ -90,12 +108,10 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
   }, []);
 
   const execCommand = (command, value = null) => {
-    // 1. Ensure we have focus (defensive programming)
     if (document.activeElement !== editorRef.current) {
         editorRef.current?.focus();
     }
 
-    // 2. Execute
     if (command === "undo" || command === "redo") {
         document.execCommand(command);
     } else if (command === "formatBlock" && value === "h2") {
@@ -105,7 +121,6 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
         document.execCommand(command, false, value);
     }
     
-    // 3. Update State
     checkActiveCommands();
     handleInput();
   };
@@ -167,15 +182,26 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
 
   return (
     <div className="w-full flex flex-col bg-slate-50 border border-slate-200 rounded-lg overflow-hidden">
-      <EditorToolbar
-        execCommand={execCommand}
-        activeCommands={activeCommands}
-        wordCount={wordCount}
-        onShowLink={() => openModal('link')}
-        onShowImage={() => openModal('image')}
-        onShowTable={() => openModal('table')}
-        onToggleFindReplace={() => setModals(m => ({ ...m, find: !m.find }))}
-      />
+      {!plainTextOnly && (
+        <EditorToolbar
+          execCommand={execCommand}
+          activeCommands={activeCommands}
+          wordCount={wordCount}
+          onShowLink={() => openModal('link')}
+          onShowImage={() => openModal('image')}
+          onShowTable={() => openModal('table')}
+          onToggleFindReplace={() => setModals(m => ({ ...m, find: !m.find }))}
+        />
+      )}
+
+      {plainTextOnly && (
+        <div className="p-3 bg-white border-b border-slate-200 flex justify-between items-center">
+          <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Plain Text Mode</span>
+          <div className="text-sm text-slate-600 font-medium px-3 py-1 bg-slate-50 rounded-lg border border-slate-200">
+            {wordCount} words
+          </div>
+        </div>
+      )}
 
       {/* Find Replace Bar */}
       {modals.find && (
@@ -188,13 +214,14 @@ const RichTextEditor = ({ value, onChange, onImageUpload }) => {
       )}
 
       {/* Editor Canvas */}
-      <div className="flex-1 overflow-auto p-4 bg-slate-50">
+      <div className={`flex-1 overflow-auto p-4 ${plainTextOnly ? 'bg-white' : 'bg-slate-50'}`}>
         <div 
           ref={editorRef}
           contentEditable
-          className="bg-white border border-slate-300 rounded-lg p-12 min-h-[400px] shadow-sm text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-100 editor-styles max-w-none"
+          className={`${plainTextOnly ? 'min-h-[300px] border-none shadow-none p-4' : 'bg-white border border-slate-300 rounded-lg p-12 min-h-[400px] shadow-sm'} text-slate-800 focus:outline-none focus:ring-4 focus:ring-blue-100 editor-styles max-w-none w-full`}
           onInput={handleInput}
           onBlur={handleInput}
+          onPaste={handlePaste}
           onMouseUp={checkActiveCommands}
           onKeyUp={checkActiveCommands}
           onKeyDown={(e) => {

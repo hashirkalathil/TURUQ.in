@@ -254,6 +254,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "turuq/posts");
       const res = await fetch("/api/admin/posts/imageUpload", {
         method: "POST",
         headers: API_HEADERS,
@@ -275,6 +276,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("folder", "turuq/posts");
       const res = await fetch("/api/admin/posts/inlineImageUpload", {
         method: "POST",
         headers: API_HEADERS,
@@ -372,7 +374,10 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     try {
       const res = await fetch("/api/admin/posts", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          ...API_HEADERS,
+          "Content-Type": "application/json" 
+        },
         body: JSON.stringify(payload),
       });
 
@@ -397,7 +402,6 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
   ];
   const currentStatusValue = statusOptions.find((opt) => opt.value === values.status) || null;
 
-  // KEY: Select which category options to use based on the mode
   const activeCategoryOptions = classificationMode === "category" ? leafCategoryOptions : allCategoryOptions;
 
 
@@ -486,6 +490,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
           value={values.content}
           onChange={handleChange}
           onImageUpload={uploadInlineImage}
+          plainTextOnly={true}
         />
       </div>
 
@@ -493,7 +498,6 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
       <ClassificationSection
         mode={classificationMode}
         onModeChange={handleModeChange}
-        // Pass the dynamically filtered options
         categoryOptions={activeCategoryOptions}
         subCategoryOptions={subCategoryOptions}
         selectedCategoryIds={values.category_ids}

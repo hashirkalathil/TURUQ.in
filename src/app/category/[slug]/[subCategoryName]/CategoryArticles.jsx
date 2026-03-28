@@ -51,6 +51,7 @@ export default function CategoryArticles({ articles }) {
 function ArticleCard({ article: a }) {
   return (
     <article className={styles.articleCard}>
+      {/* Image Container */}
       <div className={styles.articleImage}>
         <Image
           src={a.imageSrc}
@@ -58,10 +59,12 @@ function ArticleCard({ article: a }) {
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           style={{ objectFit: "cover" }}
+          priority={false}
         />
       </div>
 
       <div className={styles.cardContent}>
+        {/* Tags */}
         <div className={styles.tags}>
           {a.categories.map((c, idx) => (
             <Tag key={`${c.name}-${idx}`} link={c.link}>
@@ -69,7 +72,9 @@ function ArticleCard({ article: a }) {
             </Tag>
           ))}
         </div>
+
         <div>
+          {/* Title */}
           <Link href={`/${a.slug}`} className={styles.articleTitle}>
             {a.title}
           </Link>
@@ -77,6 +82,7 @@ function ArticleCard({ article: a }) {
           <p className={styles.articleDescription}>{a.description}</p>
         </div>
 
+        {/* Meta */}
         <div className={styles.articleMeta}>
           <span className={styles.author}>{a.author}</span>
           <span className={styles.divider}>|</span>

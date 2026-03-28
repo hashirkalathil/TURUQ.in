@@ -1,6 +1,7 @@
 // src/lib/article-service.js
 import dbConnect from "@/mongodb";
 import Post from "@/models/Post";
+import Webzine from "@/models/Webzine";
 import "@/models/Author";
 import "@/models/SubCategory";
 import "@/models/Category";
@@ -104,11 +105,36 @@ export async function getHomeData() {
 
     const mostRecentArticles = allMappedArticles.slice(0, 12);
 
-    return { heroArticles, featuredArticles, mostRecentArticles, popularArticles };
+    // Fetch archived webzines for the ArchiveSection
+    const latestWebzine = await Webzine.findOne({ status: 'published' })
+      .sort({ published_at: -1 })
+      .select('_id')
+      .lean();
+
+    const archivedWebzines = await Webzine.find({
+      status: 'published',
+      ...(latestWebzine && { _id: { $ne: latestWebzine._id } })
+    })
+      .sort({ published_at: -1 })
+      .limit(3)
+      .lean();
+
+    return { 
+      heroArticles, 
+      featuredArticles, 
+      mostRecentArticles, 
+      popularArticles, 
+      archivedWebzines: archivedWebzines.map(w => ({
+        id: w._id.toString(),
+        name: w.name,
+        slug: w.slug,
+        cover_image: w.cover_image
+      }))
+    };
 
   } catch (error) {
     console.error("Service Error in getHomeData:", error);
-    return { heroArticles: [], featuredArticles: [], mostRecentArticles: [] };
+    return { heroArticles: [], featuredArticles: [], mostRecentArticles: [], popularArticles: [], archivedWebzines: [] };
   }
 }
 

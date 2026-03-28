@@ -11,11 +11,11 @@ import PopularArticles from '@/components/popularSection';
 export const dynamic = 'force-dynamic'; 
 
 export default async function Home() {
-  const { heroArticles, featuredArticles, mostRecentArticles, popularArticles } = await getHomeData();
+  const { heroArticles, featuredArticles, mostRecentArticles, popularArticles, archivedWebzines } = await getHomeData();
 
   if (!featuredArticles.length && !mostRecentArticles.length && !heroArticles.length) {
     return (
-      <main className="flex justify-center items-center h-screen bg-[#ffedd9]">
+      <main className="flex justify-center items-center h-screen bg-background">
         <div className="text-center">
            <p className="text-2xl text-red-600 mb-2">Unable to load articles.</p>
            <p className="text-gray-500">Please try refreshing the page.</p>
@@ -25,7 +25,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="mt-5 bg-[#ffedd9] w-full">
+    <main className="mt-5 bg-background w-full">
       {/* Hero Section */}
       <div>
         <HeroSection articles={heroArticles} />
@@ -39,7 +39,7 @@ export default async function Home() {
 
       {/* Archive Section */}
       <section className="flex justify-center py-10 lg:py-16">
-        <ArchiveSection />
+        <ArchiveSection archives={archivedWebzines} />
       </section>
 
       {/* Most Recent Section */}

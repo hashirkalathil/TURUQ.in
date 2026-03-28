@@ -85,6 +85,7 @@ export const EditWebzineForm = ({ webzineId, onWebzineUpdated, onCancel }) => {
 
         const formDataUpload = new FormData();
         formDataUpload.append("file", file);
+        formDataUpload.append("folder", "turuq/webzine");
 
         try {
             const res = await fetch("/api/admin/posts/imageUpload", {

@@ -20,7 +20,16 @@ const slugify = (text) => {
     .replace(/^-+|-+$/g, "");
 };
 
-async function isAuthenticated() {
+const SERVER_API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY;
+
+async function isAuthenticated(request) {
+  // 1. Check for API Key in headers
+  const apikey = request?.headers?.get("x-api-key");
+  if (apikey && apikey === SERVER_API_KEY) {
+    return true;
+  }
+
+  // 2. Check for Session Token in cookies
   const cookieStore = await cookies();
   const token = cookieStore.get('session_token')?.value;
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -41,7 +50,6 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const postId = searchParams.get('id');
 
-    // 1. Fetch Single Post
     if (postId) {
       const post = await Post.findById(postId)
         .populate('author_id', 'name email avatar')
@@ -52,13 +60,22 @@ export async function GET(request) {
       return NextResponse.json({ data: post });
     }
 
-    // 2. Fetch List (Optimized)
     const page = parseInt(searchParams.get('page')) || 1;
     const limit = parseInt(searchParams.get('limit')) || 20;
     const skip = (page - 1) * limit;
+    
+    const isSlide = searchParams.get('is_slide') === 'true';
+    const notSlide = searchParams.get('not_slide') === 'true';
+    
+    let query = {};
+    if (isSlide) {
+      query = { "permissions.is_slide_article": true };
+    } else if (notSlide) {
+      query = { "permissions.is_slide_article": { $ne: true }, status: 'published' };
+    }
 
-    const totalPosts = await Post.countDocuments();
-    const posts = await Post.find({})
+    const totalPosts = await Post.countDocuments(query);
+    const posts = await Post.find(query)
       .select('-content -blocks -markdown')
       .sort({ created_at: -1 })
       .skip(skip)
@@ -80,7 +97,7 @@ export async function GET(request) {
 }
 
 export async function POST(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await isAuthenticated(request))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -135,7 +152,7 @@ export async function POST(request) {
 }
 
 export async function PUT(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await isAuthenticated(request))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -189,7 +206,6 @@ export async function PUT(request) {
       { new: true, runValidators: true }
     )
       .populate('author_id')
-      // ADDED: Populate here so the response confirms the save worked
       .populate('category_ids')
       .populate('subcategory_ids');
 
@@ -206,7 +222,7 @@ export async function PUT(request) {
 }
 
 export async function DELETE(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await isAuthenticated(request))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -244,7 +260,7 @@ export async function DELETE(request) {
 }
 
 export async function PATCH(request) {
-  if (!(await isAuthenticated())) {
+  if (!(await isAuthenticated(request))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -257,11 +273,10 @@ export async function PATCH(request) {
       return NextResponse.json({ message: "Post ID is required" }, { status: 400 });
     }
 
-    // Update only the webzine_id field
     const updatedPost = await Post.findByIdAndUpdate(
       _id,
-      { webzine_id: webzine_id }, // Set the new webzine_id (or null)
-      { new: true } // Return the updated document
+      { webzine_id: webzine_id },
+      { new: true }
     );
 
     if (!updatedPost) {

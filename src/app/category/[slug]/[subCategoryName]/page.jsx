@@ -51,25 +51,26 @@ export default async function SubCategoryPage({ params }) {
 
         {/* FILTER NAVIGATION */}
         <nav className={styles.subCategoryContainer}>
-          {filterLinks.map((l) => (
-            <Tag
-              key={l.slug}
-              link={
-                l.isMain
-                  ? `/category/${mainCategory.slug}`
-                  : `/category/${mainCategory.slug}/${l.slug}`
-              }
-              className={l.slug === subCategoryName ? "bg-[#e7000b]! text-white!" : ""}
-            >
-              {l.label}
-            </Tag>
-          ))}
+          {filterLinks.map((l) => {
+            const isActive = l.slug === subCategoryName || (l.isMain && !subCategoryName);
+            return (
+              <Tag
+                key={l.slug}
+                link={
+                  l.isMain
+                    ? `/category/${mainCategory.slug}`
+                    : `/category/${mainCategory.slug}/${l.slug}`
+                }
+                className={isActive ? "bg-[#e7000b]! text-white!" : "bg-background"}
+              >
+                {l.label.toUpperCase()}
+              </Tag>
+            );
+          })}
         </nav>
 
         <CategoryArticles articles={articles} />
       </div>
-
-      <Footer />
     </div>
   );
 }
