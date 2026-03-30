@@ -1,13 +1,12 @@
 // src/app/api/admin/webzines/route.js
 
-import Webzine from "@/models/Webzine"; // Ensure this matches your model path
-import Post from "@/models/Post"; // Added Post model import
+import Webzine from "@/models/Webzine";
+import Post from "@/models/Post";
 import { NextResponse } from "next/server";
-import dbConnect from "@/mongodb"; // Ensure this matches your dbConnect path
+import dbConnect from "@/mongodb";
 
 const SERVER_API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY;
 
-// Utility to create slugs automatically if not provided
 const slugify = (text) => {
   if (!text) return "";
   let slug = text.toString().toLowerCase();
@@ -18,7 +17,6 @@ const slugify = (text) => {
     .replace(/\-\-+/g, "-");
 };
 
-// --- GET: Fetch all Webzines ---
 export async function GET(req) {
   try {
     await dbConnect();
@@ -37,7 +35,6 @@ export async function GET(req) {
   }
 
   try {
-    // Sort by most recently created
     const webzines = await Webzine.find().sort({ created_at: -1 });
     return NextResponse.json(webzines);
   } catch (error) {
@@ -49,7 +46,6 @@ export async function GET(req) {
   }
 }
 
-// --- POST: Create a new Webzine ---
 export async function POST(req) {
   try {
     await dbConnect();
@@ -72,7 +68,6 @@ export async function POST(req) {
   try {
     data = await req.json();
 
-    // Handle Slug Generation
     let webzineSlug = data.slug;
     if (!webzineSlug || webzineSlug.trim() === "") {
       if (!data.name) {
@@ -88,7 +83,7 @@ export async function POST(req) {
       name: data.name,
       slug: webzineSlug,
       description: data.description,
-      cover_image: data.cover_image, // Add specific webzine fields here
+      cover_image: data.cover_image,
       status: data.status || 'draft',
       published_at: data.published_at,
     });
@@ -119,7 +114,6 @@ export async function POST(req) {
   }
 }
 
-// --- PUT: Update an existing Webzine ---
 export async function PUT(req) {
   try {
     await dbConnect();
@@ -146,7 +140,6 @@ export async function PUT(req) {
       );
     }
 
-    // Check for duplicate slug on other documents
     if (slug) {
       const existing = await Webzine.findOne({ slug, _id: { $ne: id } });
       if (existing) {
@@ -180,7 +173,6 @@ export async function PUT(req) {
   }
 }
 
-// --- DELETE: Remove a Webzine ---
 export async function DELETE(req) {
   try {
     await dbConnect();
@@ -218,7 +210,6 @@ export async function DELETE(req) {
       );
     }
 
-    // Cleanup: Remove webzine_id from associated posts
     await Post.updateMany(
       { webzine_id: id },
       { $set: { webzine_id: null } }

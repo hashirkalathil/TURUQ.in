@@ -2,6 +2,8 @@ import WebzineDetail from "@/components/webzine/WebzineDetail";
 import dbConnect from "@/mongodb";
 import Webzine from "@/models/Webzine";
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   await dbConnect();

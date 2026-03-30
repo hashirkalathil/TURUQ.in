@@ -1,5 +1,7 @@
 // src/app/[slug]/page.js
 
+export const dynamic = 'force-dynamic';
+
 import Tag from "@/components/ui/tag";
 import { getArticle } from "@/lib/mongodb";
 import { notFound } from "next/navigation";

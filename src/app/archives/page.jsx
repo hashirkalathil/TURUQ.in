@@ -9,6 +9,8 @@ export const metadata = {
     description: "Browse all previous issues of TURUQ Webzine.",
 };
 
+export const dynamic = 'force-dynamic';
+
 async function getArchivedWebzines() {
     try {
         await dbConnect();

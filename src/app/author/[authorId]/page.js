@@ -1,6 +1,8 @@
 
 import Image from "next/image";
 import { getAuthorDetails } from "@/lib/article-service";
+
+export const dynamic = 'force-dynamic';
 import PopularArticles from "@/components/popularSection";
 import SectionHeader from "@/components/reusable/SectionHeader";
 import { notFound } from "next/navigation";

@@ -7,6 +7,8 @@ export const metadata = {
   description: "Read our latest webzines and collections.",
 };
 
+export const dynamic = 'force-dynamic';
+
 export default function WebzinePage() {
   return (
     <WebzineComponent />

@@ -71,7 +71,7 @@ export default function Header({ currentUser, isSidebarOpen, setIsSidebarOpen })
         <button
           onClick={toggleMenu}
           aria-label="Toggle menu"
-          className={`relative z-10 w-10 h-10 bg-red-500 rounded-full border border-black grid place-items-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[1px] hover:translate-y-[1px] ${isSidebarOpen ? "rotate-180" : ""
+          className={`relative z-10 w-10 h-10 bg-red-500 rounded-full border border-black grid place-items-center transition-all duration-300 hover:scale-110 active:scale-95 shadow-[2px_2px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-px hover:translate-y-px ${isSidebarOpen ? "rotate-180" : ""
             }`}
         >
           <span

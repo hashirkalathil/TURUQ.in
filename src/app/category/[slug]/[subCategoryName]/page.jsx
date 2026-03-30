@@ -1,5 +1,7 @@
 // src/app/category/[slug]/[subCategoryName]/page.jsx
 
+export const dynamic = 'force-dynamic';
+
 import { notFound } from "next/navigation";
 import { getSubCategoryData } from "@/lib/category";
 import Footer from "@/components/footer/footer";

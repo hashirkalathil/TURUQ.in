@@ -1,5 +1,7 @@
 // src/app/category/[slug]/page.jsx
 
+export const dynamic = 'force-dynamic';
+
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
