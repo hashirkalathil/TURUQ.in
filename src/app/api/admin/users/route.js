@@ -1,14 +1,14 @@
 // src/app/api/admin/users/route.js
 
 import User from "@/models/User";
+import Settings from "@/models/Settings";
 import { NextResponse } from "next/server";
 import dbConnect from "@/mongodb";
 import bcrypt from "bcryptjs";
+import { getSession } from "@/lib/auth";
 
-// FIX: Allow either variable to be used as the server key
 const SECURE_API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY;
 
-// Centralized authentication function
 const checkAuth = (req) => {
     const apikey = req.headers.get("x-api-key");
     
@@ -53,11 +53,9 @@ export async function GET(req) {
       }
       result = user; 
     } else {
-      // Fetch all users
       result = await User.find().sort({ created_at: -1 });
     }
 
-    // FIX: Wrap result in 'data' for consistency with other APIs
     return NextResponse.json({ data: result });
 
   } catch (error) {
@@ -85,6 +83,18 @@ export async function POST(req) {
   }
 
   try {
+    const session = await getSession();
+    const settings = await Settings.findOne().lean();
+    
+    const isSuperAdmin = session?.role === "super-admin";
+    
+    if (!isSuperAdmin && settings?.permissions?.disable_new_users) {
+      return NextResponse.json(
+        { message: "User creation is currently disabled by administrator." },
+        { status: 403 }
+      );
+    }
+
     const data = await req.json();
 
     if (!data.password) {
@@ -138,12 +148,36 @@ export async function PUT(req) {
   }
 
   try {
+    const session = await getSession();
+    const settings = await Settings.findOne().lean();
+    const isSuperAdmin = session?.role === "super-admin";
+
     const { _id, password, ...updateData } = await req.json();
 
     if (!_id) {
       return NextResponse.json(
         { message: "User ID is required for update." },
         { status: 400 }
+      );
+    }
+
+    // Check if user is trying to edit a super-admin
+    const userToEdit = await User.findById(_id);
+    if (!userToEdit) {
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
+    }
+
+    if (userToEdit.role === "super-admin") {
+      if (!isSuperAdmin && settings?.super_admin_settings?.disable_edit_super_admin) {
+        return NextResponse.json(
+          { message: "Editing super-admin accounts is protected." },
+          { status: 403 }
+        );
+      }
+    } else if (!isSuperAdmin && settings?.permissions?.disable_edit_user) {
+      return NextResponse.json(
+        { message: "User editing is currently disabled by administrator." },
+        { status: 403 }
       );
     }
 
@@ -200,12 +234,36 @@ export async function DELETE(req) {
   }
 
   try {
+    const session = await getSession();
+    const settings = await Settings.findOne().lean();
+    const isSuperAdmin = session?.role === "super-admin";
+
     const { id } = await req.json();
 
     if (!id) {
       return NextResponse.json(
         { message: "User ID is required for deletion." },
         { status: 400 }
+      );
+    }
+
+    // Check if user is trying to delete a super-admin
+    const userToDelete = await User.findById(id);
+    if (!userToDelete) {
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
+    }
+
+    if (userToDelete.role === "super-admin") {
+      if (!isSuperAdmin && settings?.super_admin_settings?.disable_edit_super_admin) {
+        return NextResponse.json(
+          { message: "Deleting super-admin accounts is protected." },
+          { status: 403 }
+        );
+      }
+    } else if (!isSuperAdmin && settings?.permissions?.disable_delete_user) {
+      return NextResponse.json(
+        { message: "User deletion is currently disabled by administrator." },
+        { status: 403 }
       );
     }
 

@@ -22,7 +22,7 @@ export default function HeroSection({ articles }) {
   const currentSlide = articles[currentIndex];
   const totalSlides = articles.length;
   const fadeDuration = 300;
-  const slideDuration = 5000; // 5 seconds
+  const slideDuration = 5000;
 
   const changeSlide = (newIndex) => {
     if (newIndex === currentIndex) return;
@@ -66,9 +66,9 @@ export default function HeroSection({ articles }) {
     const minSwipeDistance = 50;
 
     if (distance > minSwipeDistance) {
-      handleNext(); // Swiped Left -> Next
+      handleNext();
     } else if (distance < -minSwipeDistance) {
-      handlePrev(); // Swiped Right -> Prev
+      handlePrev();
     }
   };
 
@@ -87,36 +87,33 @@ export default function HeroSection({ articles }) {
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
-      <div className="mx-auto flex w-[83%] max-w-[1250px] h-fit md:h-[450px] flex-col-reverse lg:flex-row items-center justify-between gap-5 lg:gap-10 overflow-hidden rounded-2xl border border-black p-5 lg:p-10">
+      <div className="mx-auto flex w-[83%] max-w-[1250px] h-fit md:h-[450px] flex-col-reverse lg:flex-row items-center justify-between gap-5 lg:gap-10 overflow-hidden rounded-2xl border border-black p-5 lg:p-10 relative">
         {/* Left Content Area */}
-        <div
-          className={`w-full h-full p-0 flex flex-1 flex-col justify-between gap-[5px] lg:gap-[25px] overflow-hidden transition-opacity duration-300`}
-          style={{ opacity: isFading ? 0 : 1 }}
-        >
-          {/* Tags */}
-          <div className="flex gap-1 md:gap-2">
-            {categories.map((cat, index) => (
-              <Tag key={index} link={cat.link}>
-                {cat.name}
-              </Tag>
-            ))}
-          </div>
+        <div className="w-full h-full p-0 flex flex-1 flex-col justify-between gap-[5px] lg:gap-[25px] overflow-hidden">
+          <div className="transition-opacity duration-300 flex flex-col gap-5 lg:gap-8 flex-1" style={{ opacity: isFading ? 0 : 1 }}>
+            {/* Tags */}
+            <div className="flex gap-1 md:gap-2">
+              {categories.map((cat, index) => (
+                <Tag key={index} link={cat.link}>
+                  {cat.name}
+                </Tag>
+              ))}
+            </div>
 
-          {/* Title */}
-          <Link href={link}>
-            <h2 className="local-font-rachana h-fit text-[28px] line-clamp-2 lg:line-clamp-3 lg:text-[45px] font-extrabold leading-[34px] lg:leading-12 text-[#a82a2a] hover:text-red-700 transition-colors">
-              {title}
-            </h2>
-          </Link>
+            {/* Title */}
+            <Link href={link}>
+              <h2 className="local-font-rachana h-fit text-[28px] line-clamp-2 lg:text-[45px] font-extrabold leading-[34px] lg:leading-12 text-[#a82a2a] hover:text-red-700 transition-colors">
+                {title}
+              </h2>
+            </Link>
 
-          {/* Description */}
-          <p className="local-font-rachana hidden md:block line-clamp-2 lg:line-clamp-3 text-[18px] lg:h-[100px] leading-tight font-normal text-black">
-            {description}
-          </p>
+            {/* Description */}
+            <p className="local-font-rachana hidden md:block line-clamp-1 lg:line-clamp-3 text-[18px] leading-tight font-normal text-black">
+              {description}
+            </p>
 
-          <div className="flex flex-col gap-1 lg:gap-4">
             {/* Meta */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mb-4">
               <span className="font-poppins author text-xs lg:text-sm text-black">
                 {author}
               </span>
@@ -125,69 +122,64 @@ export default function HeroSection({ articles }) {
                 {date}
               </span>
             </div>
+          </div>
 
-            {/* Pagination & Controls */}
-            <div className="flex w-full items-center gap-4">
-              {/* Pagination */}
-              <div className="pagination flex items-end gap-1 font-normal text-black">
-                <p className="inline-block items-end gap-1">
-                  {/* Current Index */}
-                  <span className="tabular-nums font-oswald text-xl lg:text-2xl min-w-[24px]">
-                    {(currentIndex + 1).toString().padStart(2, "0")}
-                  </span><span className="text-sm opacity-70">{" "}-{" "}</span>
-                  <span className="tabular-nums font-oswald text-xs md:text-[16px] opacity-70">
-                    {totalSlides.toString().padStart(2, "0")}
-                  </span>
-                </p>
-              </div>
-
-              {/* Linear Loader (Progress Bar) */}
-              <div className="relative flex-1 h-1 bg-black rounded-full overflow-hidden">
-                <div
-                  key={currentIndex}
-                  className="absolute top-0 left-0 h-full bg-red-600 animate-linear-timer"
-                />
-              </div>
-
-              {/* Navigation Buttons */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handlePrev}
-                  className="nav-btn flex h-7 w-10 items-center justify-center rounded border border-black/30 bg-red-600 transition-colors hover:bg-red-700 cursor-pointer"
-                  aria-label="Previous article"
-                >
-                  <ArrowLeft size={16} color="white" />
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="nav-btn flex h-7 w-10 items-center justify-center rounded border border-black/30 bg-red-600 transition-colors hover:bg-red-700 cursor-pointer"
-                  aria-label="Next article"
-                >
-                  <ArrowRight size={16} color="white" />
-                </button>
-              </div>
-
-              {/* Keep this OUTSIDE the flex flow logically, but it's fine here for styled-jsx */}
-              <style jsx>{`
-                .animate-linear-timer {
-                  animation: linearProgress ${slideDuration}ms linear forwards;
-                }
-                @keyframes linearProgress {
-                  from {
-                    width: 0%;
-                  }
-                  to {
-                    width: 100%;
-                  }
-                }
-              `}</style>
+          {/* Pagination & Controls (Fixed, No Fade) */}
+          <div className="flex w-full items-center gap-4 mt-auto">
+            {/* Pagination */}
+            <div className="pagination flex items-end gap-1 font-normal text-black">
+              <p className="inline-block items-end gap-1">
+                <span className="tabular-nums font-oswald text-xl lg:text-2xl min-w-[24px]">
+                  {(currentIndex + 1).toString().padStart(2, "0")}
+                </span>
+                <span className="text-sm opacity-70"> - </span>
+                <span className="tabular-nums font-oswald text-xs md:text-[16px] opacity-70">
+                  {totalSlides.toString().padStart(2, "0")}
+                </span>
+              </p>
             </div>
+
+            {/* Linear Loader (Progress Bar) */}
+            <div className="relative flex-1 h-1 bg-red-100 rounded-full overflow-hidden">
+              <div
+                key={currentIndex}
+                className="absolute top-0 left-0 h-full bg-red-700 animate-linear-timer"
+              />
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handlePrev}
+                className="nav-btn flex h-7 w-10 items-center justify-center rounded border border-black/30 bg-red-600 transition-colors hover:bg-red-700 cursor-pointer"
+                aria-label="Previous article"
+              >
+                <ArrowLeft size={16} color="white" />
+              </button>
+              <button
+                onClick={handleNext}
+                className="nav-btn flex h-7 w-10 items-center justify-center rounded border border-black/30 bg-red-600 transition-colors hover:bg-red-700 cursor-pointer"
+                aria-label="Next article"
+              >
+                <ArrowRight size={16} color="white" />
+              </button>
+            </div>
+
+            <style jsx>{`
+              .animate-linear-timer {
+                animation: linearProgress ${slideDuration}ms linear forwards;
+              }
+              @keyframes linearProgress {
+                from { width: 0%; }
+                to { width: 100%; }
+              }
+            `}</style>
           </div>
         </div>
 
         {/* Right Content Area (Image) */}
-        <div
-          className="shrink-0 h-52 lg:h-full lg:max-h-[430px] w-full lg:w-[50%] max-w-[700px] overflow-hidden rounded-2xl transition-opacity duration"
+        <div 
+          className="shrink-0 h-52 lg:h-full lg:max-h-[430px] w-full lg:w-[50%] max-w-[700px] overflow-hidden rounded-2xl transition-opacity duration-300"
           style={{ opacity: isFading ? 0 : 1 }}
         >
           <Link href={link} className="block h-full w-full">
@@ -208,6 +200,8 @@ export default function HeroSection({ articles }) {
           </Link>
         </div>
       </div>
+
+
     </section>
   );
 }

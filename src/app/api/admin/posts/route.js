@@ -7,6 +7,7 @@ import * as jose from 'jose';
 import { cookies } from 'next/headers';
 import Category from "@/models/Category";
 import SubCategory from "@/models/SubCategory";
+import { checkPermission } from "@/lib/permissions";
 
 const slugify = (text) => {
   if (!text) return "";
@@ -101,6 +102,10 @@ export async function POST(request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  // Check permission
+  const { blocked } = await checkPermission(request, "disable_new_posts");
+  if (blocked) return blocked;
+
   try {
     await dbConnect();
     const data = await request.json();
@@ -165,6 +170,15 @@ export async function PUT(request) {
       return NextResponse.json({ message: 'Post ID is required.' }, { status: 400 });
     }
 
+    // Check slide-specific permissions when toggling is_slide_article
+    if (permissions?.is_slide_article === true) {
+      const { blocked } = await checkPermission(request, "disable_add_to_slides");
+      if (blocked) return blocked;
+    } else if (permissions?.is_slide_article === false) {
+      const { blocked } = await checkPermission(request, "disable_remove_from_slides");
+      if (blocked) return blocked;
+    }
+
     // Slug Logic
     let finalSlug = undefined;
     if (incomingSlug || title) {
@@ -225,6 +239,10 @@ export async function DELETE(request) {
   if (!(await isAuthenticated(request))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  // Check permission
+  const { blocked } = await checkPermission(request, "disable_delete_post");
+  if (blocked) return blocked;
 
   try {
     await dbConnect();

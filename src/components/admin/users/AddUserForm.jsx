@@ -10,11 +10,11 @@ export const AddUserForm = ({ onUserAdded, onCancel }) => {
         name: '',
         username: '',
         email: '',
-        password: '', // Required for new user creation
+        password: '',
         phone: '',
-        status: 'active', // Default status based on schema
+        role: 'user',
+        status: 'active',
         bio: '',
-        // avatar is typically handled by file upload, omitted for simplicity
     });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -156,23 +156,23 @@ export const AddUserForm = ({ onUserAdded, onCancel }) => {
                 />
             </div>
 
-            {/* Role (Optional, default is 'user')
+            {/* Role selection */}
             <div>
                 <label htmlFor="role" className="block text-sm font-medium text-gray-700">
-                    Role
+                    Role <span className="text-red-500">*</span>
                 </label>
                 <select
                     id="role"
                     name="role"
                     value={formData.role}
                     onChange={handleChange}
+                    required
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-red-500 focus:ring-red-500 text-sm bg-background"
                 >
                     <option value="user">User</option>
                     <option value="admin">Admin</option>
-                    <option value="super-admin">Super Admin</option>
                 </select>
-            </div> */}
+            </div>
 
             {/* Biography/Bio (Optional) */}
             <div>

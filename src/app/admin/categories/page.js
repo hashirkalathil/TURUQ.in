@@ -41,6 +41,7 @@ const fetchSubCategories = async () => {
 export default function Categories() {
   const { addNotification } = useNotification();
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(null);
   
   const [categoryData, setCategoryData] = useState([]); 
   const [subCategoryData, setSubCategoryData] = useState([]); 
@@ -165,31 +166,35 @@ export default function Categories() {
         header: "Actions",
         render: (row) => (
           <div className="flex items-center space-x-2">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEdit(row._id);
-              }}
-              className="p-1 rounded-full hover:bg-yellow-100 transition-colors"
-              aria-label="Edit"
-            >
-              <Edit className="w-4 h-4 text-yellow-600" />
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleDelete(row._id);
-              }}
-              className="p-1 rounded-full hover:bg-red-100 transition-colors"
-              aria-label="Delete"
-            >
-              <Trash2 className="w-4 h-4 text-red-600" />
-            </button>
+            {!settings?.permissions?.disable_edit_category && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEdit(row._id);
+                }}
+                className="p-1 rounded-full hover:bg-yellow-100 transition-colors"
+                aria-label="Edit"
+              >
+                <Edit className="w-4 h-4 text-yellow-600" />
+              </button>
+            )}
+            {!settings?.permissions?.disable_delete_categories && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(row._id);
+                }}
+                className="p-1 rounded-full hover:bg-red-100 transition-colors"
+                aria-label="Delete"
+              >
+                <Trash2 className="w-4 h-4 text-red-600" />
+              </button>
+            )}
           </div>
         ),
       },
     ],
-    [handleEdit, handleDelete]
+    [handleEdit, handleDelete, settings]
   ); 
   
   const categoryColumns = baseColumns;
@@ -238,6 +243,10 @@ export default function Categories() {
 
   useEffect(() => {
     loadData();
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((j) => setSettings(j.data))
+      .catch(() => {});
   }, [loadData]);
 
   /* ------------- Render ------------- */
@@ -281,13 +290,15 @@ export default function Categories() {
 
       {/* Action Buttons */}
       <div className="flex justify-end mb-4">
-        <button
-          onClick={() => mainTab ? setIsAddCategoryModalOpen(true) : setIsAddSubCategoryModalOpen(true)}
-          className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
-        >
-          <PlusCircle className="w-5 h-5 mr-2" />
-          {mainTab ? "Add Category" : "Add Subcategory"}
-        </button>
+        {!settings?.permissions?.disable_create_categories && (
+          <button
+            onClick={() => mainTab ? setIsAddCategoryModalOpen(true) : setIsAddSubCategoryModalOpen(true)}
+            className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
+          >
+            <PlusCircle className="w-5 h-5 mr-2" />
+            {mainTab ? "Add Category" : "Add Subcategory"}
+          </button>
+        )}
       </div>
 
       {/* Table Display */}

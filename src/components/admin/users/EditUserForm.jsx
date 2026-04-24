@@ -32,15 +32,20 @@ export const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
                     throw new Error(`Failed to fetch user data (Status: ${res.status})`);
                 }
 
-                const data = await res.json();
+                const json = await res.json();
 
-                // Assuming the backend returns the full user object (or an array of one item)
-                const userData = data.length ? data[0] : data;
+                // Extract data from the wrapped 'data' field
+                const userData = json.data || json; 
 
-                // Set form data, but initialize password to empty string 
-                // as you never display the existing hash.
+                // If userData is an array, take the first element
+                const finalUserData = Array.isArray(userData) ? userData[0] : userData;
+
+                if (!finalUserData) {
+                    throw new Error("User data not found in response.");
+                }
+
                 setFormData({
-                    ...userData,
+                    ...finalUserData,
                     password: '', 
                 });
 
@@ -181,6 +186,24 @@ export const EditUserForm = ({ userId, onUserUpdated, onCancel }) => {
                     required
                     className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-green-500 focus:ring-green-500 text-sm"
                 />
+            </div>
+
+            {/* Role selection */}
+            <div>
+                <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                    Role <span className="text-red-500">*</span>
+                </label>
+                <select
+                    id="role"
+                    name="role"
+                    value={formData?.role || 'user'}
+                    onChange={handleChange}
+                    required
+                    className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-green-500 focus:ring-green-500 text-sm bg-background"
+                >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
             </div>
 
             {/* Password (Optional update) */}

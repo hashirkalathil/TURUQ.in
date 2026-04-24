@@ -2,6 +2,8 @@
 
 import Footer from "@/components/footer/footer";
 import Header from "@/components/header/header";
+import BackToTop from "@/components/reusable/BackToTop";
+import { NotificationProvider } from "@/components/ui/notification/NotificationProvider";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -42,18 +44,19 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body suppressHydrationWarning>
+        <NotificationProvider>
+          {!isAdmin && !loginPage && !registerPage && <Header />}
 
-        {!isAdmin && !loginPage && !registerPage && <Header />}
+          {/* Removed the opacity logic for Admin to prevent flickering */}
+          <div
+            className={loading ? "opacity-50 pointer-events-none" : "opacity-100"}
+          >
+            {children}
+          </div>
 
-        {/* Removed the opacity logic for Admin to prevent flickering */}
-        <div
-          className={loading ? "opacity-50 pointer-events-none" : "opacity-100"}
-        >
-          {children}
-        </div>
-
-        {!isAdmin && !loginPage && !registerPage && <Footer />}
-
+          {!isAdmin && !loginPage && !registerPage && <Footer />}
+          <BackToTop />
+        </NotificationProvider>
       </body>
     </html>
   );

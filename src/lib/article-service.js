@@ -138,6 +138,79 @@ export async function getHomeData() {
   }
 }
 
+export async function getFeaturedArticles() {
+  try {
+    await dbConnect();
+    const posts = await Post.find({ status: 'published', 'permissions.is_featured': true })
+      .sort({ created_at: -1 })
+      .populate('author_id')
+      .populate('category_ids')
+      .populate({
+        path: 'subcategory_ids',
+        populate: {
+          path: 'parent_id',
+          model: 'Category',
+          select: 'slug'
+        }
+      })
+      .lean()
+      .exec();
+    return posts.map(mapArticleData);
+  } catch (error) {
+    console.error("Error in getFeaturedArticles:", error);
+    return [];
+  }
+}
+
+export async function getRecentArticles() {
+  try {
+    await dbConnect();
+    const posts = await Post.find({ status: 'published' })
+      .sort({ created_at: -1 })
+      .populate('author_id')
+      .populate('category_ids')
+      .populate({
+        path: 'subcategory_ids',
+        populate: {
+          path: 'parent_id',
+          model: 'Category',
+          select: 'slug'
+        }
+      })
+      .lean()
+      .exec();
+    return posts.map(mapArticleData);
+  } catch (error) {
+    console.error("Error in getRecentArticles:", error);
+    return [];
+  }
+}
+
+export async function getPopularArticles() {
+  try {
+    await dbConnect();
+    const posts = await Post.find({ status: 'published' })
+      .sort({ views: -1 })
+      .populate('author_id')
+      .populate('category_ids')
+      .populate({
+        path: 'subcategory_ids',
+        populate: {
+          path: 'parent_id',
+          model: 'Category',
+          select: 'slug'
+        }
+      })
+      .lean()
+      .exec();
+    return posts.map(mapArticleData);
+  } catch (error) {
+    console.error("Error in getPopularArticles:", error);
+    return [];
+  }
+}
+
+
 export async function getAuthorDetails(identifier) {
   try {
     await dbConnect();

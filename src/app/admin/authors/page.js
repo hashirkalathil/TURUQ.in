@@ -1,7 +1,7 @@
 // src/app/admin/authors/page.js
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import {
   PlusCircle,
@@ -54,98 +54,95 @@ const fetchAuthors = async (addNotification) => {
   }
 }
 
-// --- TABLE COLUMNS CONFIG ---
-const columns = [
-  {
-    key: 'name',
-    header: 'Name',
-    sortable: true,
-    render: (row) => (
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 relative rounded-full overflow-hidden border border-black/50">
-          {row.avatar ? (
-            <Image
-              unoptimized={true}
-              src={row.avatar}
-              alt={row.name}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 grid place-items-center">
-              <User className="w-5 h-5 text-gray-500" />
-            </div>
-          )}
-        </div>
-        <p className="flex-1 font-bold">{row.name}</p>
-      </div>
-    ),
-  },
-  {
-    key: 'slug',
-    header: 'Slug',
-    sortable: true,
-    className: 'font-mono text-gray-600',
-  },
-  {
-    key: 'email',
-    header: 'Email',
-    sortable: true,
-  },
-  {
-    key: 'phone',
-    header: 'Phone',
-    sortable: false,
-    render: (row) => row.phone || '-',
-    className: 'text-gray-600',
-  },
-  {
-    key: 'created_at',
-    header: 'Joined At',
-    sortable: true,
-    render: (row) => new Date(row.created_at).toLocaleDateString(),
-  },
-  {
-    key: 'actions',
-    header: 'Actions',
-    sortable: false,
-    render: (row, { handleEdit, openDeleteModal }) => (
-      <div className="flex gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click
-            handleEdit(row._id);
-          }}
-          className="p-1 bg-green-600 text-white border border-black rounded text-xs hover:bg-green-700 transition-colors"
-          aria-label="Edit"
-        >
-          <Edit className="w-4 h-4" />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            openDeleteModal(row._id, row.name);
-          }}
-          className="p-1 bg-red-600 text-white border border-black rounded text-xs hover:bg-red-700 transition-colors"
-          aria-label="Delete"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
-      </div>
-    ),
-  },
-];
-
 export default function AuthorsPage() {
   const { addNotification } = useNotification();
   const [authors, setAuthors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(null);
   const [isAddAuthorModalOpen, setIsAddAuthorModalOpen] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [isEditAuthorModalOpen, setIsEditAuthorModalOpen] = useState(false);
   const [authorToEditId, setAuthorToEditId] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [authorToDelete, setAuthorToDelete] = useState({ id: null, name: '' });
+
+  const columns = useMemo(() => [
+    {
+      key: 'name',
+      header: 'Name',
+      sortable: true,
+      render: (row) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 relative rounded-full overflow-hidden border border-black/50">
+            {row.avatar ? (
+              <Image
+                unoptimized={true}
+                src={row.avatar}
+                alt={row.name}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-200 grid place-items-center">
+                <User className="w-5 h-5 text-gray-500" />
+              </div>
+            )}
+          </div>
+          <p className="flex-1 font-bold">{row.name}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'slug',
+      header: 'Slug',
+      sortable: true,
+      className: 'font-mono text-gray-600',
+    },
+    {
+      key: 'email',
+      header: 'Email',
+      sortable: true,
+    },
+    {
+      key: 'created_at',
+      header: 'Joined At',
+      sortable: true,
+      render: (row) => new Date(row.created_at).toLocaleDateString(),
+    },
+    {
+      key: 'actions',
+      header: 'Actions',
+      sortable: false,
+      render: (row, { handleEdit, openDeleteModal }) => (
+        <div className="flex gap-2">
+          {handleEdit && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(row._id);
+              }}
+              className="p-1 bg-green-600 text-white border border-black rounded text-xs hover:bg-green-700 transition-colors"
+              aria-label="Edit"
+            >
+              <Edit className="w-4 h-4" />
+            </button>
+          )}
+          {openDeleteModal && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                openDeleteModal(row._id, row.name);
+              }}
+              className="p-1 bg-red-600 text-white border border-black rounded text-xs hover:bg-red-700 transition-colors"
+              aria-label="Delete"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ], []);
 
   const loadAuthors = useCallback(async () => {
     setLoading(true);
@@ -154,7 +151,6 @@ export default function AuthorsPage() {
       const data = await fetchAuthors(addNotification);
       setAuthors(data);
 
-      // If data is empty and we don't have a key, assume config error
       if (data.length === 0 && !process.env.NEXT_PUBLIC_API_KEY) {
         setHasError(true);
       }
@@ -167,6 +163,10 @@ export default function AuthorsPage() {
 
   useEffect(() => {
     loadAuthors();
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((j) => setSettings(j.data))
+      .catch(() => {});
   }, [loadAuthors]);
 
   /* ------------- Handlers ------------- */
@@ -249,13 +249,15 @@ export default function AuthorsPage() {
         <main className="flex-1">
           {/* Action Button: New Author */}
           <div className="flex items-center justify-end mb-4">
-            <button
-              onClick={() => setIsAddAuthorModalOpen(true)}
-              className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
-            >
-              <PlusCircle className="w-5 h-5 mr-2" />
-              Add Author
-            </button>
+            {!settings?.permissions?.disable_new_authors && (
+              <button
+                onClick={() => setIsAddAuthorModalOpen(true)}
+                className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors cursor-pointer"
+              >
+                <PlusCircle className="w-5 h-5 mr-2" />
+                Add Author
+              </button>
+            )}
           </div>
 
           {/* Table component */}
@@ -264,7 +266,10 @@ export default function AuthorsPage() {
             columns={columns}
             loading={loading}
             onReload={loadAuthors}
-            handlers={{ handleEdit, openDeleteModal }}
+            handlers={{ 
+              handleEdit: settings?.permissions?.disable_edit_author ? null : handleEdit, 
+              openDeleteModal: settings?.permissions?.disable_delete_author ? null : openDeleteModal 
+            }}
             searchKeys={['name', 'email', 'slug']}
             selectable={false}
             bulkActions={[]}

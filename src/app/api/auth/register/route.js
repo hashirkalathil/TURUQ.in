@@ -2,21 +2,28 @@
 
 import dbConnect from "@/mongodb";
 import User from "@/models/User";
+import Settings from "@/models/Settings";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { Lasso, Phone } from "lucide-react";
 
 export async function POST(req, res) {
   try {
-    // Destructure 'name' directly from the request body
     const { name, username, email, password } = await req.json();
 
     await dbConnect();
+
+    const settings = await Settings.findOne().lean();
+    if (settings?.super_admin_settings?.disable_public_registration) {
+      return NextResponse.json(
+        { message: "Registration is currently closed. Please contact an administrator." },
+        { status: 403 }
+      );
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     
-    // Create a new User using the 'name' field
     const newUser = new User({
-        name, // This now correctly matches your schema
+        name,
         username,
         email,
         password: hashedPassword,

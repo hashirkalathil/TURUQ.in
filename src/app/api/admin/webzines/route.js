@@ -4,6 +4,7 @@ import Webzine from "@/models/Webzine";
 import Post from "@/models/Post";
 import { NextResponse } from "next/server";
 import dbConnect from "@/mongodb";
+import { checkPermission } from "@/lib/permissions";
 
 const SERVER_API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY;
 
@@ -62,6 +63,10 @@ export async function POST(req) {
   if (!apikey || apikey !== SERVER_API_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_create_webzines");
+  if (blocked) return blocked;
 
   let data;
 
@@ -129,6 +134,10 @@ export async function PUT(req) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_edit_webzines");
+  if (blocked) return blocked;
+
   try {
     const data = await req.json();
     const { id, name, slug, description, cover_image, status, published_at } = data;
@@ -188,6 +197,10 @@ export async function DELETE(req) {
   if (!apikey || apikey !== SERVER_API_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_delete_webzines");
+  if (blocked) return blocked;
 
   let data;
   try {

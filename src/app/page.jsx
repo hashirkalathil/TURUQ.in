@@ -7,6 +7,7 @@ import FeaturedArticles from '@/components/FeaturedArticles';
 import HeroSection from '@/components/HeroSection';
 import { getHomeData } from '@/lib/article-service';
 import PopularArticles from '@/components/popularSection';
+import NewsletterBanner from '@/components/home/NewsletterBanner';
 
 export const dynamic = 'force-dynamic'; 
 
@@ -33,7 +34,7 @@ export default async function Home() {
 
       {/* Featured Articles Section */}
       <section className="mb-28 w-full">
-        <SectionHeader> Featured Articles </SectionHeader>
+        <SectionHeader href="/featured/"> Featured Articles </SectionHeader>
         <FeaturedArticles articles={featuredArticles} /> 
       </section>
 
@@ -42,14 +43,15 @@ export default async function Home() {
         <ArchiveSection archives={archivedWebzines} />
       </section>
 
-      {/* Most Recent Section */}
       <section className="most-recent mb-16 w-full">
-        <SectionHeader> Most Recent </SectionHeader>
+        <SectionHeader href="/recent/"> Most Recent </SectionHeader>
         <MostRecentArticles articles={mostRecentArticles} />
       </section>
 
+      <NewsletterBanner />
+
       <section className="popular-articles mb-16 w-full">
-        <SectionHeader > Popular Section </SectionHeader>
+        <SectionHeader href="/popular/"> Popular Section </SectionHeader>
         <PopularArticles articles={popularArticles} />
       </section>
     </main>

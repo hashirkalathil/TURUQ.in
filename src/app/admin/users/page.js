@@ -64,6 +64,7 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(null);
   
   // Modal States
   const [isAddUsersModalOpen, setIsAddUsersModalOpen] = useState(false);
@@ -80,7 +81,12 @@ export default function UsersPage() {
       const me = await fetchCurrentUser();
       setCurrentUser(me);
 
-      // 2. Get Users List
+      // 2. Get Settings
+      const settingsRes = await fetch("/api/admin/settings");
+      const settingsJson = await settingsRes.json();
+      setSettings(settingsJson.data);
+
+      // 3. Get Users List
       const data = await fetchUsers(addNotification);
       setUsers(data);
     } finally {
@@ -162,6 +168,17 @@ export default function UsersPage() {
         });
     }
 
+    // Filter users based on super-admin settings
+    const filteredUsers = users.filter(u => {
+        // If it's a super-admin, only show if show_super_admin_role is true
+        // OR if the current user is a super-admin themselves
+        if (u.role === "super-admin") {
+            if (currentUser?.role === "super-admin") return true;
+            return settings?.super_admin_settings?.show_super_admin_role;
+        }
+        return true;
+    });
+
     // Add remaining columns
     baseCols.push(
       {
@@ -174,27 +191,49 @@ export default function UsersPage() {
         key: "actions",
         header: "Actions",
         sortable: false,
-        render: (row, { handleEdit, openDeleteModal }) => (
-          <div className="flex gap-2">
-            <button
-              onClick={(e) => { e.stopPropagation(); handleEdit(row._id); }}
-              className="p-1 bg-green-600 text-white border border-black rounded text-xs hover:bg-green-700 transition-colors"
-            >
-              <Edit className="w-4 h-4" />
-            </button>
-            <button
-              onClick={(e) => { e.stopPropagation(); openDeleteModal(row._id, row.name); }}
-              className="p-1 bg-red-600 text-white border border-black rounded text-xs hover:bg-red-700 transition-colors"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        ),
+        render: (row, { handleEdit, openDeleteModal }) => {
+          const isSuperAdminUser = row.role === "super-admin";
+          const canEditSuperAdmin = !settings?.super_admin_settings?.disable_edit_super_admin;
+          
+          const showEdit = settings?.permissions?.disable_edit_user === false || currentUser?.role === "super-admin";
+          const showDelete = settings?.permissions?.disable_delete_user === false || currentUser?.role === "super-admin";
+
+          // Special check for super-admin accounts
+          const isEditDisabled = isSuperAdminUser && !canEditSuperAdmin && currentUser?.role !== "super-admin";
+          const isDeleteDisabled = isSuperAdminUser && !canEditSuperAdmin && currentUser?.role !== "super-admin";
+
+          return (
+            <div className="flex gap-2">
+              {showEdit && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleEdit(row._id); }}
+                  disabled={isEditDisabled}
+                  className={`p-1 bg-green-600 text-white border border-black rounded text-xs hover:bg-green-700 transition-colors ${isEditDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={isEditDisabled ? "Super-Admin protection enabled" : "Edit User"}
+                >
+                  <Edit className="w-4 h-4" />
+                </button>
+              )}
+              {showDelete && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); openDeleteModal(row._id, row.name); }}
+                  disabled={isDeleteDisabled}
+                  className={`p-1 bg-red-600 text-white border border-black rounded text-xs hover:bg-red-700 transition-colors ${isDeleteDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  title={isDeleteDisabled ? "Super-Admin protection enabled" : "Delete User"}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+          );
+        },
       }
     );
 
-    return baseCols;
-  }, [currentUser, visiblePasswordIds]); // Re-calculate columns when user or visibility changes
+    return { baseCols, filteredUsers };
+  }, [currentUser, visiblePasswordIds, users, settings]); // Re-calculate when user, visibility, users list, or settings change
+
+  const { baseCols: memoizedColumns, filteredUsers } = columns;
 
   // --- CRUD HANDLERS ---
   const handleUserAdded = (newUser) => setUsers((prev) => [newUser, ...prev]);
@@ -249,18 +288,20 @@ export default function UsersPage() {
       <div className="flex gap-10">
         <main className="flex-1">
           <div className="flex items-center justify-end mb-4">
-            <button
-              onClick={() => setIsAddUsersModalOpen(true)}
-              className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              <PlusCircle className="w-5 h-5 mr-2" />
-              Add User
-            </button>
+            {(settings?.permissions?.disable_new_users === false || currentUser?.role === "super-admin") && (
+              <button
+                onClick={() => setIsAddUsersModalOpen(true)}
+                className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                <PlusCircle className="w-5 h-5 mr-2" />
+                Add User
+              </button>
+            )}
           </div>
 
           <Table
-            data={users}
-            columns={columns}
+            data={filteredUsers}
+            columns={memoizedColumns}
             loading={loading}
             onReload={loadData}
             handlers={{ handleEdit, openDeleteModal }}

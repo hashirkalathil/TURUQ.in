@@ -49,6 +49,23 @@ img {
     text-indent: 30px;
   }
 
+  /* First paragraph: no indent */
+  .article-content p:first-of-type {
+    text-indent: 0;
+  }
+
+  /* Subheading (paragraph containing only bold text): no indent */
+  .article-content p:has(> strong:only-child),
+  .article-content p:has(> b:only-child) {
+    text-indent: 0;
+  }
+
+  /* Paragraph following a subheading: no indent */
+  .article-content p:has(> strong:only-child) + p,
+  .article-content p:has(> b:only-child) + p {
+    text-indent: 0;
+  }
+
   @media (max-width: 1000px) {
     .article-content p {
       font-size: 23px;

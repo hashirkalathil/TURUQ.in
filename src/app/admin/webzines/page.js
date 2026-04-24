@@ -62,6 +62,7 @@ export default function WebzinesPage() {
   const { addNotification } = useNotification();
   const [webzines, setWebzines] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(null);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -83,6 +84,10 @@ export default function WebzinesPage() {
 
   useEffect(() => {
     loadWebzines();
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((j) => setSettings(j.data))
+      .catch(() => {});
   }, [loadWebzines]);
 
   /* ------------- Handlers ------------- */
@@ -170,13 +175,15 @@ export default function WebzinesPage() {
           <LayoutGrid className="w-6 h-6 text-background" />
           Webzines Management
         </h1>
-        <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
-        >
-          <PlusCircle className="w-5 h-5 mr-2" />
-          Add Webzine
-        </button>
+        {!settings?.permissions?.disable_create_webzines && (
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm"
+          >
+            <PlusCircle className="w-5 h-5 mr-2" />
+            Add Webzine
+          </button>
+        )}
       </div>
 
       {/* Grid Layout for Webzines */}
@@ -242,20 +249,24 @@ export default function WebzinesPage() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">
-                      <button
-                        onClick={(e) => handleEdit(e, webzine._id)}
-                        className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                        title="Edit Settings"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={(e) => openDeleteModal(e, webzine._id, webzine.name)}
-                        className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                        title="Delete Webzine"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      {!settings?.permissions?.disable_edit_webzines && (
+                        <button
+                          onClick={(e) => handleEdit(e, webzine._id)}
+                          className="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                          title="Edit Settings"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </button>
+                      )}
+                      {!settings?.permissions?.disable_delete_webzines && (
+                        <button
+                          onClick={(e) => openDeleteModal(e, webzine._id, webzine.name)}
+                          className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                          title="Delete Webzine"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>

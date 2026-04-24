@@ -36,7 +36,7 @@ const fetchSlidePosts = async (page = 1) => {
   }
 };
 
-const SLIDES_COLUMNS = [
+const getSlidesColumns = (settings) => [
   {
     key: "title",
     header: "Title",
@@ -93,16 +93,18 @@ const SLIDES_COLUMNS = [
         >
           <Eye className="w-4 h-4 text-blue-600" />
         </Link>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            handleRemoveFromSlides(post);
-          }}
-          title="Remove from Slides"
-          className="p-1 rounded-full hover:bg-red-100 transition-colors"
-        >
-          <XCircle className="w-4 h-4 text-red-600" />
-        </button>
+        {!settings?.permissions?.disable_remove_from_slides && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemoveFromSlides(post);
+            }}
+            title="Remove from Slides"
+            className="p-1 rounded-full hover:bg-red-100 transition-colors"
+          >
+            <XCircle className="w-4 h-4 text-red-600" />
+          </button>
+        )}
       </div>
     ),
   },
@@ -111,6 +113,7 @@ const SLIDES_COLUMNS = [
 export default function SlidesPage() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -144,6 +147,10 @@ export default function SlidesPage() {
 
   useEffect(() => {
     loadData(currentPage);
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((j) => setSettings(j.data))
+      .catch(() => {});
   }, [currentPage, loadData]);
 
   const handleRemoveFromSlides = async (post) => {
@@ -243,12 +250,14 @@ export default function SlidesPage() {
             >
                 <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} /> Refresh
             </button>
-            <button
-                onClick={openAddModal}
-                className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
-            >
-                <PlusCircle className="w-5 h-5 mr-2" /> Add More Slides
-            </button>
+            {!settings?.permissions?.disable_add_to_slides && (
+              <button
+                  onClick={openAddModal}
+                  className="flex items-center text-sm px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
+              >
+                  <PlusCircle className="w-5 h-5 mr-2" /> Add More Slides
+              </button>
+            )}
         </div>
       </div>
 
@@ -260,7 +269,7 @@ export default function SlidesPage() {
 
       <Table
         data={posts}
-        columns={SLIDES_COLUMNS}
+        columns={getSlidesColumns(settings)}
         loading={loading}
         searchable
         searchKeys={["title"]}

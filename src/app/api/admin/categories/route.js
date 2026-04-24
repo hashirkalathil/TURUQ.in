@@ -3,6 +3,7 @@
 import Category from "@/models/Category";
 import { NextResponse } from "next/server";
 import dbConnect from "@/mongodb";
+import { checkPermission } from "@/lib/permissions";
 
 const SERVER_API_KEY = process.env.NEXT_PUBLIC_API_KEY || process.env.API_KEY;
 
@@ -68,6 +69,10 @@ export async function POST(req) {
     console.error("Auth failed in POST");
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_create_categories");
+  if (blocked) return blocked;
 
   let data;
 
@@ -135,6 +140,10 @@ export async function PUT(req) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_edit_category");
+  if (blocked) return blocked;
+
   try {
     const data = await req.json();
     const { id, name, slug, description } = data;
@@ -195,6 +204,10 @@ export async function DELETE(req) {
     console.error("Auth failed in DELETE");
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
+
+  // Check permission
+  const { blocked } = await checkPermission(req, "disable_delete_categories");
+  if (blocked) return blocked;
 
   let data;
   try {

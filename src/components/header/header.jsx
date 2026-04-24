@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import CategoryOverlay from './categoryOverlay';
+import MobileNavbar from './MobileNavbar';
 import SearchOverlay from './searchOverlay';
 import Image from 'next/image';
 
@@ -121,7 +122,6 @@ export default function Header() {
                   width={24}
                   height={24}
                   className="w-5 h-5 sm:w-6 sm:h-6"
-                  unoptimized
                 />
               )}
             </div>
@@ -129,8 +129,13 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Categories Overlay Component */}
-      <CategoryOverlay isOpen={isMenuOpen} onClose={closeOverlays} />
+      {/* Mobile Navbar Overlay */}
+      <MobileNavbar isOpen={isMenuOpen} onClose={closeOverlays} />
+
+      {/* Categories Overlay Component - Hidden on Mobile */}
+      <div className="hidden lg:block">
+        <CategoryOverlay isOpen={isMenuOpen} onClose={closeOverlays} />
+      </div>
 
       {/* Search Overlay Component */}
       <SearchOverlay isOpen={isSearchOpen} onClose={closeOverlays} />
