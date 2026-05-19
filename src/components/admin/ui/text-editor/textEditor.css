@@ -1,0 +1,120 @@
+/* src/components/admin/ui/text-editor/textEditor.css */
+
+.editor-styles {
+  outline: none; /* handled by tailwind focus ring */
+  line-height: 1.6;
+}
+
+.editor-styles table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  table-layout: fixed; /* Better for editing */
+}
+.editor-styles table td {
+  border: 1px solid #cbd5e1;
+  padding: 8px;
+  min-width: 50px;
+  vertical-align: top;
+}
+.editor-styles blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 16px;
+  margin: 1rem 0;
+  color: #64748b;
+  font-style: italic;
+  background: #f8fafc;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+.editor-styles code {
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  color: #ef4444;
+}
+.editor-styles pre {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "Courier New", monospace;
+  margin: 1rem 0;
+}
+.editor-styles ul,
+.editor-styles ol {
+  margin: 0.75rem 0;
+  padding-left: 40px;
+}
+.editor-styles ul li {
+  list-style-type: disc;
+  margin: 4px 0;
+}
+.editor-styles ol li {
+  list-style-type: decimal;
+  margin: 4px 0;
+}
+.editor-styles a {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.editor-styles h2 {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 24px 0 12px;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+.editor-styles p {
+  font-size: 16px;
+  margin: 12px 0;
+  min-height: 1.5em; /* Ensure empty lines are clickable */
+}
+/* Ensure images don't overflow */
+.editor-styles img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+/* Footnote Markers inside editor canvas */
+.editor-styles {
+  counter-reset: footnote-counter;
+}
+
+.footnote-ref-marker {
+  counter-increment: footnote-counter;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fee2e2; /* light red */
+  color: #b91c1c; /* red-700 */
+  font-size: 11px;
+  font-weight: 700;
+  vertical-align: super;
+  padding: 1px 5px;
+  border-radius: 4px;
+  margin: 0 3px;
+  cursor: pointer;
+  user-select: none;
+  border: 1px solid #fca5a5;
+  transition: all 0.15s ease-in-out;
+  line-height: 1;
+}
+
+.footnote-ref-marker:hover {
+  background-color: #fca5a5;
+  border-color: #ef4444;
+  color: #7f1d1d;
+  transform: scale(1.08);
+}
+
+.footnote-ref-marker::before {
+  content: counter(footnote-counter);
+}

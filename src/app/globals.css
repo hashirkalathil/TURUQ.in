@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Oswald:wght@200..700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Rachana";
+  src: url("/fonts/Rachana.ttf");
+}
+
+:root {
+  --background: #ffedd9;
+  --foreground: #171717;
+}
+
+@theme {
+  --color-background: #ffedd9;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.local-font-rachana {
+  font-family: "Rachana", sans-serif;
+}
+
+.font-oswald {
+  font-family: "Oswald", sans-serif;
+}
+
+.font-poppins {
+  font-family: "Poppins", sans-serif;
+}
+
+img {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@layer components {
+  .article-content p {
+    margin-bottom: 15px;
+    font-size: 25px;
+    font-weight: 400;
+    line-height: 35px;
+    color: #000;
+    text-indent: 30px;
+  }
+
+  /* First paragraph: no indent */
+  .article-content p:first-of-type {
+    text-indent: 0;
+  }
+
+  /* Subheading (paragraph containing only bold text): no indent */
+  .article-content p:has(> strong:only-child),
+  .article-content p:has(> b:only-child) {
+    text-indent: 0;
+  }
+
+  /* Paragraph following a subheading: no indent */
+  .article-content p:has(> strong:only-child) + p,
+  .article-content p:has(> b:only-child) + p {
+    text-indent: 0;
+  }
+
+  @media (max-width: 1000px) {
+    .article-content p {
+      font-size: 23px;
+      line-height: 33px !important;
+      text-indent: 2px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .article-content p {
+      font-size: 20px;
+      line-height: 30px !important;
+      text-indent: 2px;
+    }
+  }
+
+  .article-content img {
+    width: 1100px;
+    max-width: none;
+    height: auto;
+    display: block;
+    border-radius: 20px;
+    outline: 1px solid black;
+    outline-offset: 20px;
+    margin: 40px 0 40px -220px;
+  }
+
+  /* Footnote styling */
+  .footnote-sup {
+    vertical-align: super;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 0;
+    margin: 0px 2px;
+    display: inline-block;
+  }
+
+  .footnote-ref-link {
+    color: #991b1b !important;
+    background-color: #ffedd9;
+    padding: 1px 4px;
+    border-radius: 4px;
+    text-decoration: none !important;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .footnote-ref-link:hover {
+    background-color: #fca5a5;
+    color: #7f1d1d !important;
+  }
+
+  .footnote-item {
+    transition: all 0.3s ease;
+  }
+}

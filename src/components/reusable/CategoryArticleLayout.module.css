@@ -1,0 +1,213 @@
+/* src/components/reusable/CategoryArticleLayout.module.css */
+
+.container {
+  --clr-background: #ffedd9;
+  --clr-logo: #e7000b;
+  --clr-button: #e7000b;
+  --clr-button-hover: #bb020b;
+  --clr-main-text: #e7000b;
+  --clr-black: #000;
+  width: 90%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.categoryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 60px;
+  background: var(--clr-background);
+  border-radius: 12px;
+  border: 1px solid #000;
+  margin: 30px auto;
+  min-height: 120px;
+}
+
+.categoryTitle {
+  font-family: "Oswald", sans-serif;
+  font-size: 80px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 2px;
+}
+
+.articlesContainer {
+  margin: 0 auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.articleCard {
+  height: 100%;
+  border-radius: 15px;
+  border: 1px solid #000;
+  background: var(--clr-background);
+  overflow: hidden;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
+
+.articleCard:hover {
+  transform: translateY(-2px);
+}
+
+.articleImage {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
+  background: #f0f0f0;
+  overflow: hidden;
+  position: relative;
+  border: 1px solid rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.cardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.articleTitle {
+  font-family: "Rachana", sans-serif;
+  font-size: 26px;
+  line-height: 1.3;
+  font-weight: 700;
+  color: var(--clr-main-text);
+  display: block;
+  margin-bottom: 15px;
+  text-decoration: none;
+}
+
+.articleDescription {
+  font-family: "Rachana", sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: #333;
+  margin-bottom: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.articleMeta {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Poppins", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.divider { color: #ccc; }
+
+/* 1st Article: Large Featured (Horizontal) */
+.articleCard:nth-child(1) {
+  grid-column: span 3;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 50px;
+  padding: 50px;
+}
+
+.articleCard:nth-child(1) .articleImage {
+  width: 55%;
+  aspect-ratio: 16 / 10;
+  margin-bottom: 0;
+}
+
+.articleCard:nth-child(1) .cardContent {
+  width: 45%;
+}
+
+.articleCard:nth-child(1) .articleTitle {
+  font-size: 42px;
+  line-height: 1.2;
+}
+
+.articleCard:nth-child(1) .articleDescription {
+  display: block;
+  -webkit-line-clamp: 5;
+  line-clamp: 5;
+  font-size: 18px;
+}
+
+/* 2nd Article: Broad (Horizontal/Wide) */
+.articleCard:nth-child(2) {
+  grid-column: span 2;
+}
+
+.articleCard:nth-child(2) .articleImage {
+  aspect-ratio: 21 / 9;
+}
+
+/* 4th & 8th Articles: Text Only */
+.articleCard:nth-child(4),
+.articleCard:nth-child(8) {
+  background: #ffedd9;
+}
+
+.articleCard:nth-child(4) .articleImage,
+.articleCard:nth-child(8) .articleImage {
+  display: none;
+}
+
+.articleCard:nth-child(4) .articleTitle,
+.articleCard:nth-child(8) .articleTitle {
+  font-size: 28px;
+}
+
+.articleCard:nth-child(4) .articleDescription,
+.articleCard:nth-child(8) .articleDescription {
+  -webkit-line-clamp: 10;
+  line-clamp: 10;
+}
+
+/* 9th Article: Tall/Wide bottom */
+.articleCard:nth-child(9) {
+  grid-column: span 2;
+  flex-direction: column;
+}
+
+.articleCard:nth-child(9) .articleImage {
+  aspect-ratio: 21 / 9;
+}
+
+@media screen and (max-width: 1024px) {
+  .articlesContainer {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .articleCard:nth-child(1) { grid-column: span 2; flex-direction: column; padding: 30px; }
+  .articleCard:nth-child(1) .articleImage, .articleCard:nth-child(1) .cardContent { width: 100%; }
+  .categoryTitle { font-size: 60px; }
+}
+
+@media screen and (max-width: 640px) {
+  .articlesContainer {
+    grid-template-columns: 1fr;
+  }
+  .articleCard:nth-child(1), .articleCard:nth-child(2), .articleCard:nth-child(9) { grid-column: span 1; }
+  .categoryHeader { padding: 10px 20px; min-height: 80px; }
+  .categoryTitle { font-size: 40px; }
+}

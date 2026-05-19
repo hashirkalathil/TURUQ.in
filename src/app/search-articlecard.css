@@ -1,0 +1,38 @@
+/* Make the first item span 2 columns */
+.category-article-card-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.category-article-card-container > div:nth-child(1) {
+  grid-column: span 2;
+}
+
+/* Make first card horizontal */
+.category-article-card-container > div:nth-child(1) .category-article-card {
+  flex-direction: row-reverse;
+}
+
+.category-article-card-container
+  > div:nth-child(1)
+  .category-article-image-container {
+  flex: 1;
+}
+
+.category-article-card-container
+  > div:nth-child(1)
+  .category-article-content-container {
+  flex: 1;
+}
+
+.category-article-card-container > div:nth-child(1) .category-article-content {
+  display: -webkit-box;
+}
+
+.category-article-card-container > div .category-article-content {
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+}
