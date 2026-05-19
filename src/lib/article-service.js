@@ -61,7 +61,7 @@ const mapArticleData = (article) => {
     views: article.views || 0,
     title: article.title || 'Untitled Article',
     slug: article.slug,
-    description: article.excerpt || (article.content ? article.content.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'No description available.'),
+    description: article.excerpt || (article.content ? article.content.replace(/<[^>]*>/g, '').substring(0, 300) + '...' : 'No description available.'),
     imageSrc: article.featured_image || 'https://placehold.co/1200x675/ccc/333?text=Image+Missing',
     categories: categories,
     author: authorName,
