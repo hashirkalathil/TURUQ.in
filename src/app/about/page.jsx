@@ -16,7 +16,7 @@ export default function AboutPage() {
         </h1>
         
         <p className="text-lg md:text-xl font-poppins font-light text-black/60 max-w-2xl mx-auto italic">
-          "Where knowledge, creativity, reflection, and responsible discourse converge."
+          &quot;Where knowledge, creativity, reflection, and responsible discourse converge.&quot;
         </p>
 
         <div className="flex justify-center items-center gap-4">
@@ -41,7 +41,7 @@ export default function AboutPage() {
             </h2>
             
             <p className="text-lg md:text-xl font-rachana text-black/80 italic leading-relaxed pt-2 border-l-4 border-red-600 pl-4">
-              "Envisioned as a space where knowledge, creativity, and responsible expression come together to engage modern minds."
+              &quot;Envisioned as a space where knowledge, creativity, and responsible expression come together to engage modern minds.&quot;
             </p>
           </div>
 

@@ -31,6 +31,11 @@ const PostSchema = new mongoose.Schema(
       ref: 'Author',
       required: true,
     },
+    additional_author_ids: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Author',
+      default: [],
+    }],
     webzine_id: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Webzine',

@@ -66,6 +66,11 @@ export async function getArticle(slug) {
         select: "name slug avatar biography",
       })
       .populate({
+        path: "additional_author_ids",
+        model: Author,
+        select: "name slug avatar biography",
+      })
+      .populate({
         path: 'category_ids',
         model: Category,
         select: 'name slug',

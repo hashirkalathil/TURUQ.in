@@ -25,7 +25,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     slug: "",
     excerpt: "",
     content: "",
-    author_id: "",
+    author_ids: [],
     category_ids: [],
     subcategory_ids: [],
     tags: "",
@@ -240,7 +240,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
 
   const handleAuthorAdded = (newAuthor) => {
     setAuthors((prev) => [...prev, newAuthor]);
-    setValues((prev) => ({ ...prev, author_id: newAuthor._id }));
+    setValues((prev) => ({ ...prev, author_ids: [...prev.author_ids, newAuthor._id] }));
     setIsAuthorModalOpen(false);
   };
 
@@ -250,7 +250,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     setError("");
     setImageError("");
 
-    if (!values.title || !values.slug || !values.content || !values.author_id) {
+    if (!values.title || !values.slug || !values.content || values.author_ids.length === 0) {
       setError("Title, slug, Content, and Author are required.");
       setLoading(false);
       return;
@@ -301,7 +301,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
     const payload = {
       ...values,
       featured_image: finalImageUrl,
-      author_id: values.author_id || null,
+      author_ids: values.author_ids,
       tags: values.tags
         .split(",")
         .map((t) => t.trim())
@@ -335,7 +335,7 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
   };
 
   const currentAuthorValue =
-    authorOptions.find((opt) => opt.value === values.author_id) || null;
+    authorOptions.filter((opt) => values.author_ids.includes(opt.value));
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -442,9 +442,10 @@ export default function AddPostForm({ onPostAdded, onCancel }) {
               <Select
                 options={authorOptions}
                 value={currentAuthorValue}
-                onChange={(val) => handleSingleSelectChange("author_id", val)}
-                placeholder="Select an Author"
+                onChange={(val) => handleMultiSelectChange("author_ids", val)}
+                placeholder="Select Authors"
                 isSearchable={true}
+                isMulti={true}
               />
             </div>
             <button

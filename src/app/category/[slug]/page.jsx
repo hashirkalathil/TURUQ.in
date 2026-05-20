@@ -10,6 +10,8 @@ import { dbConnect } from "@/lib/mongodb";
 import Category from "@/models/Category";
 import Tag from "@/components/ui/tag";
 import styles from "./category.module.css";
+import CategoryTag from "@/components/ui/CategoryTag";
+import ArticleListWithLoadMore from "@/components/reusable/ArticleListWithLoadMore";
 
 export async function generateStaticParams() {
   await dbConnect();
@@ -63,7 +65,7 @@ export default async function DynamicCategoryPage({ params }) {
               const isActive = (l.label === "All" && !resolvedParams.subCategoryName) || 
                                (resolvedParams.subCategoryName === l.slug);
               return (
-                <Tag
+                <CategoryTag
                   key={l.slug}
                   link={
                     l.label === "All"
@@ -73,19 +75,19 @@ export default async function DynamicCategoryPage({ params }) {
                   className={isActive ? "!bg-red-600 !text-white" : "bg-background"}
                 >
                   {l.label.toUpperCase()}
-                </Tag>
+                </CategoryTag>
               );
             })}
           </nav>
         )}
 
         {/* ARTICLES GRID */}
+        {/* ARTICLES GRID & LOAD MORE */}
         {articles.length > 0 ? (
-          <div className={styles.articlesContainer}>
-            {articles.map((a) => (
-              <ArticleCard key={a.id} article={a} />
-            ))}
-          </div>
+          <ArticleListWithLoadMore 
+            articles={articles} 
+            styles={styles} 
+          />
         ) : (
           <div style={{ textAlign: "center", padding: "80px 0" }}>
             <h2
@@ -95,59 +97,8 @@ export default async function DynamicCategoryPage({ params }) {
             </h2>
           </div>
         )}
-
-        {/* SEE MORE BUTTON - Placeholder logic */}
-        {articles.length > 20 && (
-          <div className={styles.seeMoreSection}>
-            <button className={styles.seeMoreBtn}>SEE MORE</button>
-          </div>
-        )}
       </div>
     </div>
   );
 }
-
-function ArticleCard({ article: a }) {
-  return (
-    <article className={styles.articleCard}>
-      {/* Image Container */}
-      <div className={styles.articleImage}>
-        <Image
-          src={a.imageSrc}
-          alt={a.title}
-          fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          style={{ objectFit: "cover" }}
-          priority={false}
-        />
-      </div>
-
-      <div className={styles.cardContent}>
-        {/* Tags */}
-        <div className={styles.tags}>
-          {a.categories.map((c, idx) => (
-            <Tag key={`${c.name}-${idx}`} link={c.link}>
-              {c.name}
-            </Tag>
-          ))}
-        </div>
-
-        <div>
-          {/* Title */}
-          <Link href={`/${a.slug}`} className={styles.articleTitle}>
-            {a.title}
-          </Link>
-
-          <p className={styles.articleDescription}>{a.description}</p>
-        </div>
-
-        {/* Meta */}
-        <div className={styles.articleMeta}>
-          <span className={styles.author}>{a.author}</span>
-          <span className={styles.divider}>|</span>
-          <span className={styles.date}>{a.date}</span>
-        </div>
-      </div>
-    </article>
-  );
-}
+

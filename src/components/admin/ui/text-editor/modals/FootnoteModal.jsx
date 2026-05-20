@@ -8,6 +8,7 @@ export default function FootnoteModal({ isOpen, onClose, onInsert, editingNode }
   useEffect(() => {
     if (isOpen) {
       if (editingNode) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setText(editingNode.getAttribute('data-note') || '');
       } else {
         setText('');

@@ -106,10 +106,19 @@ export async function generateMetadata({ params }) {
     title: `${article.title} — TURUQ`,
     description: article.excerpt || article.title,
     openGraph: {
-      images: [article.featured_image || "https://placehold.co/1200x630"],
       title: article.title,
       description: article.excerpt,
+      images: [article.featured_image || "https://placehold.co/1200x630"],
+      type: 'article',
+      publishedTime: article.published_at || article.created_at,
+      authors: article.author_id?.name ? [article.author_id.name, ...(article.additional_author_ids?.map(a => a.name) || [])].filter(Boolean) : [],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.title,
+      description: article.excerpt,
+      images: [article.featured_image || "https://placehold.co/1200x630"],
+    }
   };
 }
 
@@ -120,9 +129,7 @@ export default async function ArticlePage({ params }) {
 
   if (!article) notFound();
 
-  const hasValidAuthor = article.author_id && article.author_id.name;
-
-  const author = hasValidAuthor
+  const primaryAuthor = article.author_id && article.author_id.name
     ? article.author_id
     : {
       name: "Unknown Author",
@@ -131,6 +138,12 @@ export default async function ArticlePage({ params }) {
       _id: null,
     };
 
+  const additionalAuthors = Array.isArray(article.additional_author_ids) 
+    ? article.additional_author_ids.filter(a => a && a.name)
+    : [];
+
+  const allAuthors = [primaryAuthor, ...additionalAuthors];
+
   const { processedHtml, footnotes } = extractFootnotes(article.content);
   const readTime = calculateReadTime(article.content);
   const categories = getDisplayCategories(article);
@@ -138,8 +151,35 @@ export default async function ArticlePage({ params }) {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://turuq.in";
   const shareUrl = `${siteUrl}/${article.slug}`;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: article.title,
+    image: article.featured_image ? [article.featured_image] : [],
+    datePublished: article.published_at || article.created_at,
+    dateModified: article.updated_at || article.published_at || article.created_at,
+    author: allAuthors.map(author => ({
+      '@type': 'Person',
+      name: author.name,
+      url: author._id ? `${siteUrl}/author/${author._id}` : undefined
+    })),
+    publisher: {
+      '@type': 'Organization',
+      name: 'TURUQ',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/icon1.png`
+      }
+    },
+    description: article.excerpt
+  };
+
   return (
     <main className="mt-8 px-4">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Client Component: View Counter (Invisible) */}
       <ViewCounter slug={slug} />
 
@@ -159,54 +199,56 @@ export default async function ArticlePage({ params }) {
       <div className="max-w-[1250px] mx-auto flex flex-col lg:flex-row-reverse items-start justify-between gap-10 px-1">
         {/* LEFT: AUTHOR + SHARE */}
         <aside className="flex flex-col shrink-0 items-center gap-6 w-full lg:w-[300px] order-2 lg:order-2">
-          <div className="w-full border border-black rounded-3xl p-6 text-center bg-[#ffedd9] transition-shadow font-poppins">
-            <div className="text-xs font-bold tracking-wider mb-4 text-black/50 uppercase">
-              Author
-            </div>
+          {allAuthors.map((author, index) => (
+            <div key={author._id || index} className="w-full border border-black rounded-3xl p-6 text-center bg-[#ffedd9] transition-shadow font-poppins">
+              <div className="text-xs font-bold tracking-wider mb-4 text-black/50 uppercase">
+                Author
+              </div>
 
-            <div className="relative inline-block mb-4">
-              {author.avatar ? (
-                <Image
-                  src={author.avatar}
-                  alt={author.name || "Author"}
-                  width={80}
-                  height={80}
-                  className="rounded-full object-cover border border-black shadow-sm bg-white"
-                  unoptimized
-                />
+              <div className="relative inline-block mb-4">
+                {author.avatar ? (
+                  <Image
+                    src={author.avatar}
+                    alt={author.name || "Author"}
+                    width={80}
+                    height={80}
+                    className="rounded-full object-cover border border-black shadow-sm bg-white"
+                    unoptimized
+                  />
+                ) : (
+                  <div className="w-20 h-20 rounded-full border border-black shadow-sm bg-gray-50 flex items-center justify-center text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
+                      <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              <h3 className="font-bold local-font-rachana text-lg lg:text-xl mb-2 text-black">
+                {author.name}
+              </h3>
+
+              <p className="text-sm local-font-rachana text-black/70 leading-relaxed mb-5 px-2 line-clamp-3">
+                {author.biography}
+              </p>
+
+              {author._id ? (
+                <Link
+                  href={`/author/${author._id}`}
+                  className="block w-full px-6 py-3 border border-black text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all duration-200 uppercase text-sm font-bold tracking-wide shadow-sm hover:shadow-md text-center"
+                >
+                  Visit Profile
+                </Link>
               ) : (
-                <div className="w-20 h-20 rounded-full border border-black shadow-sm bg-gray-50 flex items-center justify-center text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-10 h-10">
-                    <path fillRule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clipRule="evenodd" />
-                  </svg>
-                </div>
+                <button
+                  disabled
+                  className="w-full px-6 py-3 border border-black/10 text-black/30 rounded-xl uppercase text-sm font-bold tracking-wide cursor-not-allowed"
+                >
+                  Profile Unavailable
+                </button>
               )}
             </div>
-
-            <h3 className="font-bold local-font-rachana text-lg lg:text-xl mb-2 text-black">
-              {author.name}
-            </h3>
-
-            <p className="text-sm local-font-rachana text-black/70 leading-relaxed mb-5 px-2 line-clamp-3">
-              {author.biography}
-            </p>
-
-            {author._id ? (
-              <Link
-                href={`/author/${author._id}`}
-                className="block w-full px-6 py-3 border border-black text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all duration-200 uppercase text-sm font-bold tracking-wide shadow-sm hover:shadow-md text-center"
-              >
-                Visit Profile
-              </Link>
-            ) : (
-              <button
-                disabled
-                className="w-full px-6 py-3 border border-black/10 text-black/30 rounded-xl uppercase text-sm font-bold tracking-wide cursor-not-allowed"
-              >
-                Profile Unavailable
-              </button>
-            )}
-          </div>
+          ))}
 
           {article.translator && (
             <div className="w-full border border-black rounded-3xl p-4 text-center bg-[#ffedd9] transition-shadow font-poppins">

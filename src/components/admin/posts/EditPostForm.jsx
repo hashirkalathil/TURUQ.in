@@ -42,7 +42,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     slug: "",
     excerpt: "",
     content: "",
-    author_id: "",
+    author_ids: [],
     category_ids: [],
     subcategory_ids: [],
     tags: "",
@@ -99,7 +99,11 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
         setSubCategories(Array.isArray(subCatsData) ? subCatsData : []);
 
         // 2. Process Post Data for Form
-        const authorId = post.author_id ? (post.author_id._id || post.author_id) : "";
+        const primaryAuthorId = post.author_id ? (post.author_id._id || post.author_id) : null;
+        const extraAuthorIds = Array.isArray(post.additional_author_ids) 
+          ? post.additional_author_ids.map(id => id._id || id) 
+          : [];
+        const allAuthorIds = [primaryAuthorId, ...extraAuthorIds].filter(Boolean);
         const catIds = Array.isArray(post.category_ids)
           ? post.category_ids.map(id => id._id || id)
           : [];
@@ -124,7 +128,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
           slug: post.slug || "",
           excerpt: post.excerpt || "",
           content: post.content || "",
-          author_id: authorId,
+          author_ids: allAuthorIds,
           category_ids: catIds,
           subcategory_ids: subcatIds,
           tags: formattedTags,
@@ -306,7 +310,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
 
   const handleAuthorAdded = (newAuthor) => {
     setAuthors((prev) => [...prev, newAuthor]);
-    setValues((prev) => ({ ...prev, author_id: newAuthor._id }));
+    setValues((prev) => ({ ...prev, author_ids: [...prev.author_ids, newAuthor._id] }));
     setIsAuthorModalOpen(false);
   };
 
@@ -318,7 +322,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     setImageError("");
 
     // Validation
-    if (!values.title || !values.slug || !values.content || !values.author_id) {
+    if (!values.title || !values.slug || !values.content || values.author_ids.length === 0) {
       setError("Title, slug, Content, and Author are required.");
       setLoading(false);
       return;
@@ -367,7 +371,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
     const payload = {
       ...values,
       featured_image: finalImageUrl,
-      author_id: values.author_id === "" ? null : values.author_id,
+      author_ids: values.author_ids,
       tags: values.tags.split(",").map((t) => t.trim()).filter(Boolean),
       permissions: permissions,
       _id: postId, // Ensure ID is sent
@@ -395,7 +399,7 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
   };
 
   // --- RENDER HELPERS ---
-  const currentAuthorValue = authorOptions.find((opt) => opt.value === values.author_id) || null;
+  const currentAuthorValue = authorOptions.filter((opt) => values.author_ids.includes(opt.value));
 
   const statusOptions = [
     { label: "Draft", value: "draft" },
@@ -516,10 +520,11 @@ export default function EditPostForm({ postId, onPostUpdated, onCancel }) {
               <Select
                 options={authorOptions}
                 value={currentAuthorValue}
-                onChange={(val) => handleSingleSelectChange("author_id", val)}
-                placeholder="Select an Author"
+                onChange={(val) => handleMultiSelectChange("author_ids", val)}
+                placeholder="Select Authors"
                 isSearchable={true}
                 isClearable={false}
+                isMulti={true}
               />
             </div>
             <button

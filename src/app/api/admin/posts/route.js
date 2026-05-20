@@ -54,6 +54,7 @@ export async function GET(request) {
     if (postId) {
       const post = await Post.findById(postId)
         .populate('author_id', 'name email avatar')
+        .populate('additional_author_ids', 'name email avatar')
         .populate('category_ids', 'name slug')
         .populate('subcategory_ids', 'name slug')
         .lean();
@@ -82,6 +83,7 @@ export async function GET(request) {
       .skip(skip)
       .limit(limit)
       .populate('author_id', 'name avatar')
+      .populate('additional_author_ids', 'name avatar')
       .populate('category_ids', 'name')
       .populate('subcategory_ids', 'name')
       .lean();
@@ -114,8 +116,17 @@ export async function POST(request) {
       return NextResponse.json({ message: 'Title is required.' }, { status: 400 });
     }
 
-    if (data.author_id) {
-      const authorExists = await Author.findById(data.author_id);
+    let primary_author_id = null;
+    let extra_author_ids = [];
+    if (data.author_ids && Array.isArray(data.author_ids) && data.author_ids.length > 0) {
+      primary_author_id = data.author_ids[0];
+      extra_author_ids = data.author_ids.slice(1);
+    } else if (data.author_id) {
+      primary_author_id = data.author_id;
+    }
+
+    if (primary_author_id) {
+      const authorExists = await Author.findById(primary_author_id);
       if (!authorExists) {
         return NextResponse.json({ message: 'Invalid Author ID provided.' }, { status: 400 });
       }
@@ -142,6 +153,8 @@ export async function POST(request) {
       permissions: permissions,
       category_ids: data.category_ids || [],
       subcategory_ids: data.subcategory_ids || [],
+      author_id: primary_author_id,
+      additional_author_ids: extra_author_ids,
     });
 
     await newPost.save();
@@ -198,6 +211,11 @@ export async function PUT(request) {
       subcategory_ids: updateData.subcategory_ids || [],
       category_ids: updateData.category_ids || [],
     };
+
+    if (data.author_ids && Array.isArray(data.author_ids) && data.author_ids.length > 0) {
+      update.author_id = data.author_ids[0];
+      update.additional_author_ids = data.author_ids.slice(1);
+    }
 
     if (title) update.title = title;
     if (finalSlug) update.slug = finalSlug;

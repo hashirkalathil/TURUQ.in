@@ -70,7 +70,7 @@ export default function Layout({ children }) {
                         />
                         
                         <div 
-                            className="flex w-[90%] max-w-[1400px] mx-auto mt-[150px] gap-10"
+                            className="flex w-[83%] max-w-[1250px] mx-auto mt-[150px] gap-10"
                             style={{ height: 'calc(100vh - 150px)' }} 
                         >
                             {isSidebarOpen && <Sidebar />}

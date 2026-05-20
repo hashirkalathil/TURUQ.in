@@ -1,13 +1,6 @@
-"use client";
-
-import Footer from "@/components/footer/footer";
-import Header from "@/components/header/header";
-import BackToTop from "@/components/reusable/BackToTop";
-import { NotificationProvider } from "@/components/ui/notification/NotificationProvider";
-import "./globals.css";
-import { usePathname } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
 import { Oswald } from 'next/font/google';
+import "./globals.css";
+import ClientLayoutWrapper from "@/components/reusable/ClientLayoutWrapper";
 
 const oswald = Oswald({
   subsets: ['latin'],
@@ -15,59 +8,71 @@ const oswald = Oswald({
   variable: '--font-oswald',
 });
 
+export const metadata = {
+  metadataBase: new URL('https://turuq.in'),
+  title: {
+    template: '%s | TURUQ',
+    default: 'TURUQ | Webzine',
+  },
+  description: 'TURUQ is a platform dedicated to fostering thoughtful discourse on culture, art, and society.',
+  keywords: ['TURUQ', 'Webzine', 'Culture', 'Art', 'Society', 'Discourse', 'Articles', 'Malayalam'],
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://turuq.in',
+    siteName: 'TURUQ',
+    title: 'TURUQ | Webzine',
+    description: 'TURUQ is a platform dedicated to fostering thoughtful discourse on culture, art, and society.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'TURUQ | Webzine',
+    description: 'TURUQ is a platform dedicated to fostering thoughtful discourse on culture, art, and society.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export default function RootLayout({ children }) {
-  const [loading, setLoading] = useState(false);
-  const pathname = usePathname();
-
-  const isAdmin = pathname.startsWith("/admin");
-  const loginPage = pathname === "/admin/login";
-  const registerPage = pathname === "/admin/register";
-
-  useEffect(() => {
-    if (isAdmin) return;
-
-    let timer;
-    const startLoading = () => {
-      setLoading(true);
-      timer = setTimeout(() => {
-        setLoading(false);
-      }, 300);
-    };
-
-    const requestTimer = setTimeout(startLoading, 0);
-
-    return () => {
-      clearTimeout(requestTimer);
-      if (timer) clearTimeout(timer);
-    };
-  }, [pathname, isAdmin]);
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'TURUQ',
+    url: 'https://turuq.in',
+    logo: 'https://turuq.in/icon1.png',
+    sameAs: [
+      'https://www.instagram.com/turuq.in/',
+      'https://www.facebook.com/profile.php?id=61554438333912'
+    ],
+  };
 
   return (
     <html lang="en">
-      <head>
-        <title>TURUQ | Webzine</title>
-        <meta
-          name="description"
-          content="TURUQ is a platform dedicated to fostering thoughtful discourse on culture, art, and society."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </head>
+    <head>
+      <meta name="apple-mobile-web-app-title" content="TURUQ" />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+    </head>
       <body className={`${oswald.variable} font-sans`} suppressHydrationWarning>
-        <NotificationProvider>
-          {!isAdmin && !loginPage && !registerPage && <Header />}
-
-          {/* Removed the opacity logic for Admin to prevent flickering */}
-          <div
-            className={loading ? "opacity-50 pointer-events-none" : "opacity-100"}
-          >
-            {children}
-          </div>
-
-          {!isAdmin && !loginPage && !registerPage && <Footer />}
-          <BackToTop />
-        </NotificationProvider>
+        <ClientLayoutWrapper>
+          {children}
+        </ClientLayoutWrapper>
       </body>
     </html>
   );

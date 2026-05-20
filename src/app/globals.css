@@ -83,14 +83,16 @@ img {
   }
 
   .article-content img {
-    width: 1100px;
+    width: 100%;
+    aspect-ratio: 16/9;
+    object-fit: cover;
     max-width: none;
     height: auto;
     display: block;
     border-radius: 20px;
     outline: 1px solid black;
     outline-offset: 20px;
-    margin: 40px 0 40px -220px;
+    margin: 40px 20px;
   }
 
   /* Footnote styling */
